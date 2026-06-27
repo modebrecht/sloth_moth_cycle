@@ -1,0 +1,338 @@
+<div class="sloth-premium-v2" style="--x: 58%; --y: 18%; --size: 300px;">
+  <svg viewBox="0 0 520 430" xmlns="http://www.w3.org/2000/svg" aria-label="Animated premium sloth">
+    <defs>
+      <radialGradient id="ps2Fur" cx="38%" cy="25%" r="80%">
+        <stop offset="0%" stop-color="#c99767"/>
+        <stop offset="55%" stop-color="#a36d43"/>
+        <stop offset="100%" stop-color="#6e4329"/>
+      </radialGradient>
+
+      <radialGradient id="ps2DarkFur" cx="35%" cy="20%" r="85%">
+        <stop offset="0%" stop-color="#8a5635"/>
+        <stop offset="100%" stop-color="#4b2b1b"/>
+      </radialGradient>
+
+      <linearGradient id="ps2Face" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#fff3cf"/>
+        <stop offset="65%" stop-color="#efd09e"/>
+        <stop offset="100%" stop-color="#d8aa72"/>
+      </linearGradient>
+
+      <linearGradient id="ps2Branch" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#5b321d"/>
+        <stop offset="45%" stop-color="#8b5631"/>
+        <stop offset="100%" stop-color="#5a311b"/>
+      </linearGradient>
+
+      <linearGradient id="ps2Leaf" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#9cc64d"/>
+        <stop offset="100%" stop-color="#3e752f"/>
+      </linearGradient>
+
+      <filter id="ps2Shadow" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#000" flood-opacity="0.22"/>
+      </filter>
+    </defs>
+
+    <!-- leaves behind branch -->
+    <g class="ps2-leaves">
+      <path d="M104 86 C82 57, 82 30, 95 13 C126 34, 130 64, 104 86Z" fill="url(#ps2Leaf)"/>
+      <path d="M122 96 C145 69, 171 60, 192 69 C178 105, 148 116, 122 96Z" fill="url(#ps2Leaf)"/>
+      <path d="M408 74 C390 43, 397 19, 416 8 C440 34, 436 62, 408 74Z" fill="url(#ps2Leaf)"/>
+      <path d="M424 90 C452 69, 477 67, 493 82 C470 113, 442 115, 424 90Z" fill="url(#ps2Leaf)"/>
+    </g>
+
+    <!-- branch -->
+    <g filter="url(#ps2Shadow)">
+      <path d="M42 118 C132 104, 262 116, 482 100"
+            fill="none"
+            stroke="url(#ps2Branch)"
+            stroke-width="34"
+            stroke-linecap="round"/>
+
+      <path d="M96 113 C136 92, 159 67, 177 32"
+            fill="none"
+            stroke="#714321"
+            stroke-width="16"
+            stroke-linecap="round"/>
+
+      <path d="M350 106 C388 82, 410 54, 421 23"
+            fill="none"
+            stroke="#714321"
+            stroke-width="16"
+            stroke-linecap="round"/>
+
+      <path d="M96 109 C192 101, 324 107, 443 96"
+            fill="none"
+            stroke="#a96d3e"
+            stroke-width="5"
+            stroke-linecap="round"
+            opacity="0.45"/>
+    </g>
+
+    <!-- whole sloth hanging from branch -->
+    <g class="ps2-sloth" filter="url(#ps2Shadow)">
+      <!-- arms behind branch -->
+      <path class="ps2-arm-left"
+            d="M178 114 C142 140, 121 189, 131 238 C137 270, 156 291, 181 294 C160 241, 170 181, 214 132Z"
+            fill="url(#ps2Fur)"/>
+
+      <path class="ps2-arm-right"
+            d="M342 108 C382 135, 403 187, 392 239 C385 273, 364 293, 338 294 C361 238, 351 176, 305 128Z"
+            fill="url(#ps2Fur)"/>
+
+      <!-- gripping claws on top of branch -->
+      <g class="ps2-claws">
+        <path d="M175 95 C168 110, 164 128, 165 144" />
+        <path d="M193 94 C188 111, 186 129, 189 146" />
+        <path d="M211 97 C208 113, 209 130, 215 145" />
+
+        <path d="M309 94 C302 111, 299 129, 301 146" />
+        <path d="M327 93 C323 111, 323 129, 328 146" />
+        <path d="M345 96 C344 113, 347 130, 354 145" />
+      </g>
+
+      <!-- body -->
+      <g class="ps2-body">
+        <path d="M179 205
+                 C185 152, 223 124, 266 127
+                 C316 130, 353 170, 359 226
+                 C367 305, 327 374, 263 381
+                 C199 388, 158 321, 179 205Z"
+              fill="url(#ps2Fur)"/>
+
+        <path d="M216 223
+                 C230 198, 286 193, 312 226
+                 C339 260, 319 330, 267 341
+                 C217 333, 194 266, 216 223Z"
+              fill="#c79562"
+              opacity="0.32"/>
+
+        <!-- belly fur strokes -->
+        <g opacity="0.24" fill="none" stroke="#f1c38b" stroke-width="4" stroke-linecap="round">
+          <path d="M226 248 C245 235, 272 233, 294 244"/>
+          <path d="M215 286 C237 303, 277 306, 306 287"/>
+          <path d="M235 335 C260 345, 291 335, 307 312"/>
+        </g>
+      </g>
+
+      <!-- head -->
+      <g class="ps2-head">
+        <path d="M164 191
+                 C156 129, 196 82, 257 80
+                 C319 78, 361 126, 354 190
+                 C348 245, 307 281, 258 282
+                 C207 283, 171 246, 164 191Z"
+              fill="url(#ps2DarkFur)"/>
+
+        <!-- top hair -->
+        <path d="M221 88 C230 61, 252 58, 260 82 C274 58, 299 64, 299 91 C274 80, 245 80, 221 88Z"
+              fill="#8a5635"/>
+
+        <!-- cream face mask -->
+        <path d="M184 184
+                 C181 139, 208 107, 241 128
+                 C249 134, 253 143, 258 152
+                 C263 142, 269 133, 279 127
+                 C312 108, 339 140, 334 185
+                 C329 230, 298 258, 259 259
+                 C218 259, 188 230, 184 184Z"
+              fill="url(#ps2Face)"/>
+
+        <!-- dark eye patches -->
+        <path d="M199 181
+                 C202 148, 224 132, 248 138
+                 C244 174, 225 198, 199 203Z"
+              fill="#5a3420"/>
+
+        <path d="M316 181
+                 C313 148, 291 132, 267 138
+                 C271 174, 290 198, 316 203Z"
+              fill="#5a3420"/>
+
+        <!-- eyes -->
+        <g class="ps2-eyes">
+          <circle cx="228" cy="175" r="16" fill="#201511"/>
+          <circle cx="288" cy="175" r="16" fill="#201511"/>
+          <circle cx="233" cy="168" r="5.5" fill="#fff"/>
+          <circle cx="293" cy="168" r="5.5" fill="#fff"/>
+        </g>
+
+        <!-- nose -->
+        <path d="M240 199
+                 C247 188, 268 188, 276 199
+                 C273 214, 264 221, 258 221
+                 C251 221, 243 214, 240 199Z"
+              fill="#3a2823"/>
+
+        <ellipse cx="250" cy="202" rx="4.5" ry="3" fill="#18100e" opacity="0.75"/>
+        <ellipse cx="267" cy="202" rx="4.5" ry="3" fill="#18100e" opacity="0.75"/>
+
+        <!-- smile -->
+        <path d="M225 224 C239 242, 278 242, 293 224"
+              fill="none"
+              stroke="#3b2a22"
+              stroke-width="5"
+              stroke-linecap="round"/>
+      </g>
+
+      <!-- feet / lower claws -->
+      <g class="ps2-feet">
+        <path d="M202 346 C181 367, 156 371, 136 354" fill="none" stroke="#8a5635" stroke-width="28" stroke-linecap="round"/>
+        <path d="M314 346 C337 367, 362 371, 383 354" fill="none" stroke="#8a5635" stroke-width="28" stroke-linecap="round"/>
+
+        <g class="ps2-foot-claws">
+          <path d="M137 354 C124 362, 113 365, 101 364"/>
+          <path d="M151 364 C140 376, 130 383, 118 386"/>
+          <path d="M166 367 C160 381, 153 391, 142 397"/>
+
+          <path d="M381 354 C394 362, 405 365, 417 364"/>
+          <path d="M367 364 C378 376, 388 383, 400 386"/>
+          <path d="M352 367 C358 381, 365 391, 376 397"/>
+        </g>
+      </g>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .sloth-premium-v2 {
+    position: absolute;
+    left: var(--x, 58%);
+    top: var(--y, 18%);
+    width: var(--size, 300px);
+    z-index: 35;
+    pointer-events: none;
+    animation: ps2Float 5.5s ease-in-out infinite;
+    transform-origin: 50% 20%;
+  }
+
+  .sloth-premium-v2 svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .ps2-sloth {
+    animation: ps2HangSway 6.2s ease-in-out infinite;
+    transform-origin: 260px 110px;
+  }
+
+  .ps2-head {
+    animation: ps2Head 5.4s ease-in-out infinite;
+    transform-origin: 258px 205px;
+  }
+
+  .ps2-body {
+    animation: ps2Breath 4.8s ease-in-out infinite;
+    transform-origin: 260px 260px;
+  }
+
+  .ps2-arm-left {
+    animation: ps2ArmLeft 5.7s ease-in-out infinite;
+    transform-origin: 190px 112px;
+  }
+
+  .ps2-arm-right {
+    animation: ps2ArmRight 6.1s ease-in-out infinite;
+    transform-origin: 330px 108px;
+  }
+
+  .ps2-leaves {
+    animation: ps2Leaves 4.4s ease-in-out infinite;
+    transform-origin: 260px 100px;
+  }
+
+  .ps2-eyes {
+    animation: ps2Blink 6.4s infinite;
+    transform-origin: 258px 175px;
+  }
+
+  .ps2-claws path,
+  .ps2-foot-claws path {
+    fill: none;
+    stroke: #fff0cf;
+    stroke-width: 10;
+    stroke-linecap: round;
+  }
+
+  .ps2-foot-claws path {
+    stroke-width: 8;
+  }
+
+  @keyframes ps2Float {
+    0%, 100% {
+      transform: translateY(0) rotate(-0.8deg);
+    }
+    50% {
+      transform: translateY(-8px) rotate(0.9deg);
+    }
+  }
+
+  @keyframes ps2HangSway {
+    0%, 100% {
+      transform: rotate(-1.5deg);
+    }
+    50% {
+      transform: rotate(1.5deg);
+    }
+  }
+
+  @keyframes ps2Head {
+    0%, 100% {
+      transform: rotate(2deg);
+    }
+    50% {
+      transform: rotate(-2.4deg);
+    }
+  }
+
+  @keyframes ps2Breath {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.018);
+    }
+  }
+
+  @keyframes ps2ArmLeft {
+    0%, 100% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(-2deg);
+    }
+  }
+
+  @keyframes ps2ArmRight {
+    0%, 100% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(2deg);
+    }
+  }
+
+  @keyframes ps2Leaves {
+    0%, 100% {
+      transform: rotate(-1deg);
+    }
+    50% {
+      transform: rotate(1.5deg);
+    }
+  }
+
+  @keyframes ps2Blink {
+    0%, 91%, 100% {
+      transform: scaleY(1);
+    }
+    93% {
+      transform: scaleY(0.08);
+    }
+    95% {
+      transform: scaleY(1);
+    }
+  }
+</style>

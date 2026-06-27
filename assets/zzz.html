@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Animated SVG Sloths</title>
+<style>
+  :root{
+    --bg1:#fff7df;
+    --bg2:#dff7e8;
+    --card:#ffffffcc;
+    --ink:#3d2414;
+    --leaf:#4aa332;
+    --leaf2:#79c846;
+    --wood:#8b552b;
+    --wood-dark:#5d341b;
+    --fur:#a76f37;
+    --fur2:#c79150;
+    --fur-dark:#6c3f20;
+    --cream:#ffe8bb;
+    --cream2:#f7d79f;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 15% 15%, #ffffff 0 12%, transparent 32%),
+      radial-gradient(circle at 85% 10%, #f9d38666 0 14%, transparent 35%),
+      linear-gradient(135deg,var(--bg1),var(--bg2));
+    overflow-x:hidden;
+  }
+
+  .jungle-bg{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.35;
+    background:
+      radial-gradient(ellipse at 8% 90%, #6bbd4970 0 12%, transparent 13%),
+      radial-gradient(ellipse at 92% 88%, #4da73c70 0 13%, transparent 14%);
+    z-index:-1;
+  }
+
+  main{
+    width:min(1180px,94vw);
+    margin:0 auto;
+    padding:42px 0 56px;
+  }
+
+  h1{
+    margin:0 0 8px;
+    font-size:clamp(2rem,4vw,4rem);
+    line-height:.95;
+    letter-spacing:-.055em;
+    text-align:center;
+  }
+
+  .subtitle{
+    margin:0 auto 30px;
+    text-align:center;
+    max-width:720px;
+    color:#5b3d27;
+    font-size:clamp(1rem,1.8vw,1.18rem);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:24px;
+    align-items:stretch;
+  }
+
+  .card{
+    position:relative;
+    border:1px solid #fff8;
+    border-radius:34px;
+    padding:22px;
+    background:var(--card);
+    box-shadow:0 28px 70px #71461b25, inset 0 1px 0 #fff;
+    overflow:hidden;
+    backdrop-filter:blur(16px);
+  }
+
+  .card::before{
+    content:"";
+    position:absolute;
+    inset:12px;
+    border-radius:26px;
+    border:1px dashed #8bcf7635;
+    pointer-events:none;
+  }
+
+  .badge{
+    position:absolute;
+    top:20px;
+    left:20px;
+    z-index:5;
+    display:inline-flex;
+    gap:.45rem;
+    align-items:center;
+    border-radius:999px;
+    padding:.45rem .75rem;
+    background:#fff8;
+    color:#5b3d27;
+    font-size:.9rem;
+    font-weight:800;
+    box-shadow:0 8px 22px #5d341b18;
+  }
+
+  .svg-wrap{
+    position:relative;
+    min-height:560px;
+    display:grid;
+    place-items:center;
+    isolation:isolate;
+  }
+
+  svg{
+    display:block;
+    width:min(100%,520px);
+    height:auto;
+    overflow:visible;
+  }
+
+  .caption{
+    position:relative;
+    z-index:3;
+    margin:4px 2px 0;
+    padding:14px 16px;
+    border-radius:20px;
+    background:#fff9;
+    line-height:1.45;
+    color:#4a3322;
+  }
+
+  .caption b{color:#2f1b10}
+
+  /* ===== Shared SVG styling ===== */
+  .soft-shadow{filter:drop-shadow(0 24px 22px rgba(93,52,27,.20));}
+  .fur-line{fill:none;stroke:rgba(83,45,22,.34);stroke-width:3;stroke-linecap:round;opacity:.55}
+  .fur-line-light{fill:none;stroke:rgba(255,228,184,.42);stroke-width:3;stroke-linecap:round;opacity:.45}
+  .leaf{transform-box:fill-box;transform-origin:50% 100%;animation:leafSway 3.8s ease-in-out infinite}
+  .leaf:nth-of-type(2n){animation-delay:-1.4s;animation-duration:4.7s}
+  .leaf:nth-of-type(3n){animation-delay:-.8s;animation-duration:3.2s}
+
+  @keyframes leafSway{
+    0%,100%{transform:rotate(-3deg)}
+    50%{transform:rotate(5deg)}
+  }
+
+  /* ===== Awake sloth animation ===== */
+  #awake-sloth .awake-root{
+    transform-box:fill-box;
+    transform-origin:50% 72%;
+    animation:awakeFloat 3.4s ease-in-out infinite;
+  }
+  #awake-sloth .awake-head{
+    transform-box:fill-box;
+    transform-origin:50% 72%;
+    animation:headTilt 5.4s ease-in-out infinite;
+  }
+  #awake-sloth .wave-arm{
+    transform-box:fill-box;
+    transform-origin:75% 76%;
+    animation:wave 2.15s ease-in-out infinite;
+  }
+  #awake-sloth .eye-shine{
+    transform-box:fill-box;
+    transform-origin:center;
+    animation:shine 3.2s ease-in-out infinite;
+  }
+  #awake-sloth .blink{
+    transform-box:fill-box;
+    transform-origin:center;
+    animation:blink 5.2s infinite;
+  }
+  #awake-sloth .ground-shadow{animation:shadowPulse 3.4s ease-in-out infinite;transform-origin:center}
+  #awake-sloth .sparkle{animation:sparklePop 2.8s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+  #awake-sloth .sparkle.s2{animation-delay:.7s}
+  #awake-sloth .sparkle.s3{animation-delay:1.25s}
+
+  @keyframes awakeFloat{
+    0%,100%{transform:translateY(0) rotate(-.4deg)}
+    50%{transform:translateY(-12px) rotate(.7deg)}
+  }
+  @keyframes headTilt{
+    0%,100%{transform:rotate(-1.2deg)}
+    50%{transform:rotate(2.2deg)}
+  }
+  @keyframes wave{
+    0%,100%{transform:rotate(-6deg) translateY(0)}
+    18%{transform:rotate(13deg) translateY(-6px)}
+    36%{transform:rotate(-9deg) translateY(0)}
+    54%{transform:rotate(14deg) translateY(-5px)}
+    72%{transform:rotate(-4deg) translateY(0)}
+  }
+  @keyframes blink{
+    0%,91%,100%{transform:scaleY(1)}
+    94%,96%{transform:scaleY(.08)}
+  }
+  @keyframes shine{
+    0%,100%{opacity:.75;transform:translate(0,0) scale(1)}
+    50%{opacity:1;transform:translate(3px,-2px) scale(1.08)}
+  }
+  @keyframes shadowPulse{
+    0%,100%{opacity:.22;transform:scaleX(1)}
+    50%{opacity:.13;transform:scaleX(.88)}
+  }
+  @keyframes sparklePop{
+    0%,70%,100%{opacity:.15;transform:scale(.65) rotate(0deg)}
+    35%{opacity:1;transform:scale(1.05) rotate(15deg)}
+  }
+
+  /* ===== Sleeping sloth animation ===== */
+  #sleep-sloth .sleep-root{
+    transform-box:fill-box;
+    transform-origin:50% 48%;
+    animation:sleepRock 5.8s ease-in-out infinite;
+  }
+  #sleep-sloth .sleep-body{
+    transform-box:fill-box;
+    transform-origin:48% 55%;
+    animation:breathe 3.5s ease-in-out infinite;
+  }
+  #sleep-sloth .sleep-head{
+    transform-box:fill-box;
+    transform-origin:55% 72%;
+    animation:sleepNod 3.5s ease-in-out infinite;
+  }
+  #sleep-sloth .zzz text{
+    font-weight:900;
+    font-family:inherit;
+    fill:#6e4526;
+    opacity:0;
+    animation:zzzFloat 3.6s ease-in-out infinite;
+  }
+  #sleep-sloth .zzz text:nth-child(2){animation-delay:.65s;font-size:36px}
+  #sleep-sloth .zzz text:nth-child(3){animation-delay:1.3s;font-size:46px}
+  #sleep-sloth .leaf-left{animation-delay:.3s}
+  #sleep-sloth .leaf-right{animation-delay:-1s}
+
+  @keyframes sleepRock{
+    0%,100%{transform:rotate(-.7deg) translateY(0)}
+    50%{transform:rotate(.9deg) translateY(-4px)}
+  }
+  @keyframes breathe{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.018) translateY(-2px)}
+  }
+  @keyframes sleepNod{
+    0%,100%{transform:rotate(0deg)}
+    50%{transform:rotate(2.4deg) translateY(2px)}
+  }
+  @keyframes zzzFloat{
+    0%{opacity:0;transform:translate(0,16px) scale(.7)}
+    22%{opacity:.85}
+    70%{opacity:.65}
+    100%{opacity:0;transform:translate(26px,-54px) scale(1.12)}
+  }
+
+  @media (max-width:860px){
+    main{padding-top:28px}
+    .grid{grid-template-columns:1fr}
+    .svg-wrap{min-height:500px}
+    .card{border-radius:28px;padding:16px}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;scroll-behavior:auto!important}
+  }
+</style>
+</head>
+<body>
+<div class="jungle-bg"></div>
+<main>
+  <h1>Animated SVG Sloths</h1>
+  <p class="subtitle">Zwei komplett inline gezeichnete SVG-Faultiere: winkendes Maskottchen + schlafendes Faultier auf Ast. Keine PNGs, keine externen Assets.</p>
+
+  <section class="grid" aria-label="Animated sloth SVG collection">
+    <article class="card">
+      <div class="badge">🦥 SVG 1 · awake</div>
+      <div class="svg-wrap">
+        <svg id="awake-sloth" viewBox="0 0 640 640" role="img" aria-label="Animiertes winkendes Faultier als SVG">
+          <defs>
+            <radialGradient id="a-bg" cx="50%" cy="35%" r="70%">
+              <stop offset="0" stop-color="#fff9e8"/>
+              <stop offset="1" stop-color="#f0f8e6"/>
+            </radialGradient>
+            <linearGradient id="a-fur" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#c9914f"/>
+              <stop offset=".54" stop-color="#a66a32"/>
+              <stop offset="1" stop-color="#7b461f"/>
+            </linearGradient>
+            <linearGradient id="a-fur-light" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#d8a765"/>
+              <stop offset="1" stop-color="#a36a33"/>
+            </linearGradient>
+            <linearGradient id="a-cream" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#fff0ca"/>
+              <stop offset="1" stop-color="#e8b977"/>
+            </linearGradient>
+            <radialGradient id="a-eye" cx="40%" cy="34%" r="65%">
+              <stop offset="0" stop-color="#5b270c"/>
+              <stop offset=".55" stop-color="#2b1208"/>
+              <stop offset="1" stop-color="#060302"/>
+            </radialGradient>
+            <linearGradient id="a-nose" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#68615b"/>
+              <stop offset=".45" stop-color="#191817"/>
+              <stop offset="1" stop-color="#060606"/>
+            </linearGradient>
+            <linearGradient id="a-claw" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#fff8dc"/>
+              <stop offset=".55" stop-color="#efd39b"/>
+              <stop offset="1" stop-color="#9d7135"/>
+            </linearGradient>
+            <filter id="a-soft" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="16" stdDeviation="13" flood-color="#603919" flood-opacity=".22"/>
+            </filter>
+          </defs>
+
+          <ellipse class="ground-shadow" cx="328" cy="575" rx="150" ry="28" fill="#543018" opacity=".22"/>
+          <circle cx="315" cy="308" r="285" fill="url(#a-bg)" opacity=".8"/>
+
+          <g class="sparkle" opacity=".8">
+            <path d="M93 145l9 22 22 9-22 9-9 22-9-22-22-9 22-9z" fill="#ffd976"/>
+          </g>
+          <g class="sparkle s2" opacity=".8">
+            <path d="M543 164l7 17 17 7-17 7-7 17-7-17-17-7 17-7z" fill="#9ada58"/>
+          </g>
+          <g class="sparkle s3" opacity=".8">
+            <path d="M518 498l6 14 14 6-14 6-6 14-6-14-14-6 14-6z" fill="#ffb86b"/>
+          </g>
+
+          <g class="awake-root soft-shadow" filter="url(#a-soft)">
+            <!-- back arm -->
+            <path d="M435 319c52 8 89 44 91 91 2 45-25 83-74 96-20 5-37-8-35-29 4-47-16-94-38-127-12-18 21-37 56-31z" fill="url(#a-fur)" stroke="#5d341b" stroke-width="5"/>
+            <path d="M420 390c24 20 32 54 19 88" class="fur-line"/>
+            <path d="M452 407c18 18 23 43 13 66" class="fur-line-light"/>
+
+            <!-- legs -->
+            <path d="M218 414c-35 58-51 120-37 155 11 28 61 25 86 2 20-18 22-72 19-122z" fill="url(#a-fur)" stroke="#5d341b" stroke-width="5"/>
+            <path d="M371 414c38 58 58 118 46 154-10 30-63 29-90 4-21-20-24-75-22-124z" fill="url(#a-fur)" stroke="#5d341b" stroke-width="5"/>
+
+            <!-- body -->
+            <path d="M185 238c-48 63-55 179-10 253 30 50 84 74 145 74 67 0 123-28 150-83 35-72 25-174-26-238-63-78-196-82-259-6z" fill="url(#a-fur)" stroke="#5d341b" stroke-width="6"/>
+            <path d="M228 327c-25 66-7 160 41 185 46 24 108 8 132-39 30-59 11-145-44-178-52-30-105-23-129 32z" fill="url(#a-fur-light)" opacity=".62"/>
+            <path d="M222 329c26-24 64-38 101-35 43 4 80 29 99 69" fill="none" stroke="#e6b671" stroke-width="7" stroke-linecap="round" opacity=".25"/>
+            <path d="M244 386c18-24 60-42 102-29" class="fur-line-light"/>
+            <path d="M228 432c32 10 71 12 108 1" class="fur-line"/>
+            <path d="M277 512c28 9 65 6 91-10" class="fur-line-light"/>
+
+            <!-- waving arm -->
+            <g class="wave-arm">
+              <path d="M196 278c-60-14-91-54-91-101 0-38 22-67 53-73 29-6 50 14 51 43 2 48 28 76 59 94 22 13 7 55-72 37z" fill="url(#a-fur)" stroke="#5d341b" stroke-width="6"/>
+              <path d="M146 119c16 34 31 66 77 91" class="fur-line-light"/>
+              <path d="M122 155c20 30 43 53 78 68" class="fur-line"/>
+              <path d="M105 175c22 27 49 48 84 58" class="fur-line-light"/>
+              <!-- hand claws -->
+              <path d="M120 96c7-18 26-18 27 4 0 27-12 48-21 58-10 11-22 2-17-13 4-14 7-33 11-49z" fill="url(#a-claw)" stroke="#7e5a2d" stroke-width="3"/>
+              <path d="M149 91c8-18 27-15 26 7-1 27-15 47-25 56-11 10-22 0-16-15 6-14 10-32 15-48z" fill="url(#a-claw)" stroke="#7e5a2d" stroke-width="3"/>
+              <path d="M178 99c11-16 29-10 24 11-7 27-25 42-36 50-12 7-20-4-11-18 8-13 15-29 23-43z" fill="url(#a-claw)" stroke="#7e5a2d" stroke-width="3"/>
+            </g>
+
+            <!-- face/head -->
+            <g class="awake-head">
+              <path d="M196 87c42-41 126-50 183-23 63 30 96 92 84 157-16 84-82 126-157 124-82-3-146-53-154-129-5-49 10-95 44-129z" fill="url(#a-fur)" stroke="#5d341b" stroke-width="6"/>
+              <!-- tufts -->
+              <path d="M235 70c16-35 45-49 86-48-17 14-21 25-23 38 25-22 62-31 100-21-22 11-36 25-43 42 32-12 65-9 91 13-31-2-55 5-76 19" fill="url(#a-fur)" stroke="#5d341b" stroke-width="5" stroke-linejoin="round"/>
+              <path d="M195 102c34-38 92-58 148-49" class="fur-line-light"/>
+              <path d="M347 68c38 5 70 25 89 57" class="fur-line"/>
+
+              <path d="M184 148c26-45 74-68 127-67 56 2 111 29 136 78-10 91-66 142-139 143-74 1-130-53-124-154z" fill="url(#a-cream)"/>
+              <path d="M191 159c33 16 68 51 73 95-33 7-70-4-89-29-19-25-13-54 16-66z" fill="#6b3d20" opacity=".95"/>
+              <path d="M430 163c-34 13-69 45-78 88 32 11 70 3 92-19 23-23 17-54-14-69z" fill="#6b3d20" opacity=".95"/>
+              <path d="M242 263c29 35 100 37 135 3" fill="none" stroke="#4a2815" stroke-width="7" stroke-linecap="round"/>
+              <path d="M264 286c34 17 78 13 107-8" fill="none" stroke="#fff3d6" stroke-width="4" stroke-linecap="round" opacity=".32"/>
+              <ellipse cx="307" cy="231" rx="54" ry="38" fill="url(#a-cream)" opacity=".66"/>
+              <path d="M262 206c13-12 29-16 46-12" fill="none" stroke="#7a4a27" stroke-width="7" stroke-linecap="round"/>
+              <path d="M354 195c16-4 31 0 42 11" fill="none" stroke="#7a4a27" stroke-width="7" stroke-linecap="round"/>
+
+              <g class="blink">
+                <circle cx="248" cy="207" r="31" fill="url(#a-eye)"/>
+                <circle cx="371" cy="207" r="31" fill="url(#a-eye)"/>
+                <circle class="eye-shine" cx="237" cy="196" r="10" fill="#fff"/>
+                <circle class="eye-shine" cx="360" cy="196" r="10" fill="#fff"/>
+                <circle cx="258" cy="218" r="6" fill="#b97932" opacity=".7"/>
+                <circle cx="381" cy="218" r="6" fill="#b97932" opacity=".7"/>
+              </g>
+
+              <path d="M278 228c16-15 47-15 64 0 15 13 6 38-31 39-37 0-50-25-33-39z" fill="url(#a-nose)" stroke="#16100d" stroke-width="4"/>
+              <ellipse cx="292" cy="238" rx="10" ry="7" fill="#050505" opacity=".72"/>
+              <ellipse cx="329" cy="238" rx="10" ry="7" fill="#050505" opacity=".72"/>
+              <path d="M288 224c18-8 39-8 53 1" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity=".3"/>
+            </g>
+
+            <!-- front arm and claws -->
+            <path d="M395 315c-35 39-52 87-45 131 4 22 25 29 44 18 43-25 64-76 58-123-3-24-39-45-57-26z" fill="url(#a-fur)" stroke="#5d341b" stroke-width="6"/>
+            <path d="M397 346c-20 31-27 64-17 96" class="fur-line"/>
+            <path d="M392 454c5-22 25-31 37-14 14 20 4 48-10 67-13 18-30 8-27-10 3-15 1-28 0-43z" fill="url(#a-claw)" stroke="#7e5a2d" stroke-width="3"/>
+            <path d="M421 456c8-21 29-27 38-8 10 22-4 49-21 65-15 16-30 2-23-15 5-14 6-28 6-42z" fill="url(#a-claw)" stroke="#7e5a2d" stroke-width="3"/>
+            <path d="M447 461c12-18 33-19 37 3 4 23-16 46-35 58-17 11-28-4-18-20 7-12 12-27 16-41z" fill="url(#a-claw)" stroke="#7e5a2d" stroke-width="3"/>
+
+            <!-- foot claws -->
+            <path d="M168 568c-20 4-35 17-36 35 17 7 38-2 48-19 7-12 2-19-12-16z" fill="url(#a-claw)" stroke="#7e5a2d" stroke-width="3"/>
+            <path d="M194 570c-22 6-36 21-35 40 19 5 40-7 49-25 6-13 0-19-14-15z" fill="url(#a-claw)" stroke="#7e5a2d" stroke-width="3"/>
+            <path d="M222 570c-20 9-31 25-27 43 19 2 38-12 44-31 5-14-4-18-17-12z" fill="url(#a-claw)" stroke="#7e5a2d" stroke-width="3"/>
+            <path d="M386 570c21 4 36 17 37 35-18 7-39-2-49-19-7-12-2-19 12-16z" fill="url(#a-claw)" stroke="#7e5a2d" stroke-width="3"/>
+            <path d="M414 571c22 6 36 21 35 40-19 5-41-7-50-25-6-13 1-19 15-15z" fill="url(#a-claw)" stroke="#7e5a2d" stroke-width="3"/>
+            <path d="M441 570c20 9 31 25 27 43-20 2-39-12-45-31-4-14 5-18 18-12z" fill="url(#a-claw)" stroke="#7e5a2d" stroke-width="3"/>
+          </g>
+        </svg>
+      </div>
+      <p class="caption"><b>Winkendes Faultier:</b> leichte Schwebe, winkender Arm, Blinzeln, Glanz in den Augen und kleine Sparkles.</p>
+    </article>
+
+    <article class="card">
+      <div class="badge">🌿 SVG 2 · sleeping</div>
+      <div class="svg-wrap">
+        <svg id="sleep-sloth" viewBox="0 0 720 640" role="img" aria-label="Animiertes schlafendes Faultier auf Ast als SVG">
+          <defs>
+            <radialGradient id="s-bg" cx="50%" cy="32%" r="72%">
+              <stop offset="0" stop-color="#fff9ea"/>
+              <stop offset="1" stop-color="#e8f8dc"/>
+            </radialGradient>
+            <linearGradient id="s-fur" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#d09b5b"/>
+              <stop offset=".48" stop-color="#ab7138"/>
+              <stop offset="1" stop-color="#71411f"/>
+            </linearGradient>
+            <linearGradient id="s-fur2" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#c88e4d"/>
+              <stop offset="1" stop-color="#8c5428"/>
+            </linearGradient>
+            <linearGradient id="s-cream" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#fff1ca"/>
+              <stop offset="1" stop-color="#e6b878"/>
+            </linearGradient>
+            <linearGradient id="s-wood" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#b16d37"/>
+              <stop offset=".55" stop-color="#7d4623"/>
+              <stop offset="1" stop-color="#4e2b16"/>
+            </linearGradient>
+            <linearGradient id="s-leaf" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#99e052"/>
+              <stop offset="1" stop-color="#2f8b2c"/>
+            </linearGradient>
+            <linearGradient id="s-claw" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#fff9e2"/>
+              <stop offset=".55" stop-color="#edcf91"/>
+              <stop offset="1" stop-color="#9e7034"/>
+            </linearGradient>
+            <linearGradient id="s-nose" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#716a65"/>
+              <stop offset=".5" stop-color="#1e1c1a"/>
+              <stop offset="1" stop-color="#050505"/>
+            </linearGradient>
+            <filter id="s-soft" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="20" stdDeviation="15" flood-color="#543018" flood-opacity=".22"/>
+            </filter>
+          </defs>
+
+          <circle cx="360" cy="315" r="295" fill="url(#s-bg)" opacity=".84"/>
+          <g class="zzz" transform="translate(472 112)">
+            <text x="0" y="90" font-size="28">Z</text>
+            <text x="36" y="57">Z</text>
+            <text x="82" y="28">Z</text>
+          </g>
+
+          <g class="sleep-root soft-shadow" filter="url(#s-soft)">
+            <!-- branch behind sloth -->
+            <path d="M87 414c89-57 188-83 294-84 111-1 198 29 265 66 21 12 24 44 3 57-72 45-159 53-259 45-98-8-196-7-285 13-38 8-69-67-18-97z" fill="url(#s-wood)" stroke="#4f2b15" stroke-width="7" stroke-linecap="round"/>
+            <path d="M95 438c164-36 338-52 520 3" fill="none" stroke="#d79a56" stroke-width="7" stroke-linecap="round" opacity=".35"/>
+            <path d="M126 475c141-43 291-53 458-21" fill="none" stroke="#4b2714" stroke-width="5" stroke-linecap="round" opacity=".32"/>
+            <path d="M244 410c64-18 150-24 255 8" fill="none" stroke="#f4c27a" stroke-width="4" stroke-linecap="round" opacity=".28"/>
+
+            <!-- left twig and leaves -->
+            <g class="leaf-left">
+              <path d="M110 408c-26-45-44-76-76-95" fill="none" stroke="#704018" stroke-width="8" stroke-linecap="round"/>
+              <g class="leaf"><path d="M42 303c44-24 78-19 99 19-40 18-74 18-99-19z" fill="url(#s-leaf)" stroke="#2c7729" stroke-width="3"/><path d="M54 305c25 3 50 7 75 17" fill="none" stroke="#bdf47c" stroke-width="3" opacity=".7"/></g>
+              <g class="leaf"><path d="M66 360c-15-43 1-72 45-87 11 45-5 73-45 87z" fill="url(#s-leaf)" stroke="#2c7729" stroke-width="3"/><path d="M70 350c12-25 24-48 38-68" fill="none" stroke="#bdf47c" stroke-width="3" opacity=".7"/></g>
+              <g class="leaf"><path d="M121 344c14-41 43-55 83-37-19 39-48 52-83 37z" fill="url(#s-leaf)" stroke="#2c7729" stroke-width="3"/><path d="M131 341c20-14 42-25 64-32" fill="none" stroke="#bdf47c" stroke-width="3" opacity=".7"/></g>
+            </g>
+
+            <!-- right twig and leaves -->
+            <g class="leaf-right">
+              <path d="M600 457c41 22 65 49 76 87" fill="none" stroke="#704018" stroke-width="8" stroke-linecap="round"/>
+              <g class="leaf"><path d="M646 538c42-21 75-15 94 22-39 16-71 14-94-22z" fill="url(#s-leaf)" stroke="#2c7729" stroke-width="3"/><path d="M657 541c22 1 45 7 69 18" fill="none" stroke="#bdf47c" stroke-width="3" opacity=".7"/></g>
+              <g class="leaf"><path d="M608 529c-4-45 18-70 64-75 0 45-21 69-64 75z" fill="url(#s-leaf)" stroke="#2c7729" stroke-width="3"/><path d="M615 519c15-23 32-42 52-59" fill="none" stroke="#bdf47c" stroke-width="3" opacity=".7"/></g>
+            </g>
+
+            <!-- sloth body -->
+            <g class="sleep-body">
+              <path d="M247 277c49-70 152-92 242-68 88 23 147 87 145 155-2 70-61 102-153 96-72-5-137-20-219-7-89 14-139-55-92-119 20-27 45-43 77-57z" fill="url(#s-fur)" stroke="#5d341b" stroke-width="7"/>
+              <path d="M359 263c60-35 154-26 204 27 31 33 31 76-5 93-74 34-181 12-225-40-24-28-9-59 26-80z" fill="url(#s-fur2)" opacity=".55"/>
+              <path d="M353 229c65-20 149-8 202 37" class="fur-line-light"/>
+              <path d="M423 311c56 21 113 17 157-10" class="fur-line"/>
+              <path d="M296 418c85-21 174-15 266 6" class="fur-line-light"/>
+            </g>
+
+            <!-- hanging arms/legs -->
+            <path d="M327 388c-22 37-31 94-18 137 8 27 43 27 56 2 21-41 27-90 11-133-9-26-35-30-49-6z" fill="url(#s-fur)" stroke="#5d341b" stroke-width="6"/>
+            <path d="M505 374c-21 40-21 91-3 133 12 27 49 21 57-8 12-45 9-91-13-129-14-24-30-17-41 4z" fill="url(#s-fur)" stroke="#5d341b" stroke-width="6"/>
+            <path d="M314 517c-8 18-2 37 15 44 12-15 15-38 7-51-7-12-17-6-22 7z" fill="url(#s-claw)" stroke="#7e5a2d" stroke-width="3"/>
+            <path d="M342 521c-7 20 1 40 20 45 11-17 11-39 1-52-8-11-17-5-21 7z" fill="url(#s-claw)" stroke="#7e5a2d" stroke-width="3"/>
+            <path d="M534 498c-1 21 12 38 31 37 5-19-1-40-15-49-11-8-16 0-16 12z" fill="url(#s-claw)" stroke="#7e5a2d" stroke-width="3"/>
+            <path d="M508 502c0 21 13 38 32 37 5-19-2-40-16-50-11-7-16 1-16 13z" fill="url(#s-claw)" stroke="#7e5a2d" stroke-width="3"/>
+
+            <!-- head and front arm pillow -->
+            <path d="M207 332c-44 12-73 47-66 87 8 45 63 53 98 31 29-18 43-61 28-92-10-21-34-33-60-26z" fill="url(#s-fur)" stroke="#5d341b" stroke-width="6"/>
+            <path d="M162 403c24 4 52-4 78-27" class="fur-line-light"/>
+            <path d="M205 447c-3 20 10 36 28 36 8-18 4-39-8-50-10-9-18 2-20 14z" fill="url(#s-claw)" stroke="#7e5a2d" stroke-width="3"/>
+            <path d="M234 442c-4 20 9 37 27 37 9-18 6-39-6-51-10-9-18 2-21 14z" fill="url(#s-claw)" stroke="#7e5a2d" stroke-width="3"/>
+
+            <g class="sleep-head">
+              <path d="M180 207c43-51 124-61 182-28 49 29 73 80 62 130-14 63-70 97-138 91-77-8-128-56-127-119 0-28 7-53 21-74z" fill="url(#s-fur)" stroke="#5d341b" stroke-width="6"/>
+              <path d="M202 186c36-33 92-45 144-27" class="fur-line-light"/>
+              <path d="M219 176c11-30 43-42 79-39-15 10-22 21-25 35 24-21 61-20 89-3-25 2-43 10-55 24" fill="url(#s-fur)" stroke="#5d341b" stroke-width="5" stroke-linejoin="round"/>
+
+              <path d="M176 244c30-43 76-62 124-54 49 8 89 39 104 87-18 63-68 91-125 84-61-8-101-48-103-117z" fill="url(#s-cream)"/>
+              <path d="M187 254c31 4 63 28 75 60-26 14-60 11-81-8-20-18-18-43 6-52z" fill="#6c3d20"/>
+              <path d="M394 272c-31-1-65 18-82 48 24 18 58 20 82 4 24-15 24-41 0-52z" fill="#6c3d20"/>
+              <path d="M225 287c19 17 42 17 61 1" fill="none" stroke="#2a170c" stroke-width="7" stroke-linecap="round"/>
+              <path d="M320 300c20 16 43 15 61-2" fill="none" stroke="#2a170c" stroke-width="7" stroke-linecap="round"/>
+              <path d="M263 338c25 24 75 30 105 6" fill="none" stroke="#4a2815" stroke-width="7" stroke-linecap="round"/>
+              <path d="M278 302c15-13 44-11 59 5 14 15 4 37-31 35-34-1-45-26-28-40z" fill="url(#s-nose)" stroke="#16100d" stroke-width="4"/>
+              <ellipse cx="291" cy="314" rx="9" ry="6" fill="#050505" opacity=".73"/>
+              <ellipse cx="324" cy="316" rx="9" ry="6" fill="#050505" opacity=".73"/>
+              <path d="M286 298c16-6 33-5 47 3" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".28"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <p class="caption"><b>Schlafendes Faultier:</b> sanftes Atmen, leichtes Schaukeln, schwebende ZZZ und bewegte Blätter.</p>
+    </article>
+  </section>
+</main>
+</body>
+</html>

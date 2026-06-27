@@ -1,0 +1,180 @@
+<div class="toucan-wrap">
+  <svg class="toucan-svg" viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg" aria-label="Toucan sitting on a branch">
+    <defs>
+      <linearGradient id="toucanBody" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#202625"/>
+        <stop offset="55%" stop-color="#0f1313"/>
+        <stop offset="100%" stop-color="#050607"/>
+      </linearGradient>
+
+      <linearGradient id="toucanWing" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#3a4645"/>
+        <stop offset="100%" stop-color="#151918"/>
+      </linearGradient>
+
+      <linearGradient id="toucanBeakTop" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#8de96b"/>
+        <stop offset="28%" stop-color="#d8ef56"/>
+        <stop offset="55%" stop-color="#ffd44c"/>
+        <stop offset="80%" stop-color="#ff9a33"/>
+        <stop offset="100%" stop-color="#ff5c2b"/>
+      </linearGradient>
+
+      <linearGradient id="toucanBeakBottom" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#f7d548"/>
+        <stop offset="55%" stop-color="#ffab36"/>
+        <stop offset="100%" stop-color="#ff6c2f"/>
+      </linearGradient>
+
+      <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000000" flood-opacity="0.18"/>
+      </filter>
+    </defs>
+
+    <!-- branch -->
+    <g filter="url(#softShadow)">
+      <path d="M40 262 C120 250, 215 255, 372 245"
+            fill="none"
+            stroke="#7a5030"
+            stroke-width="16"
+            stroke-linecap="round"/>
+      <path d="M120 257 C111 272, 95 284, 76 291"
+            fill="none"
+            stroke="#5d3a22"
+            stroke-width="8"
+            stroke-linecap="round"/>
+      <path d="M266 250 C279 265, 296 276, 318 284"
+            fill="none"
+            stroke="#5d3a22"
+            stroke-width="8"
+            stroke-linecap="round"/>
+    </g>
+
+    <!-- tail -->
+    <path d="M124 164 C97 175, 86 204, 103 226 C122 218, 142 200, 149 177 Z"
+          fill="#080909"/>
+
+    <!-- body -->
+    <ellipse cx="185" cy="176" rx="74" ry="68" fill="url(#toucanBody)"/>
+
+    <!-- white chest -->
+    <path d="M168 132
+             C147 140, 136 159, 137 183
+             C138 210, 157 230, 185 232
+             C202 220, 213 198, 213 172
+             C213 149, 198 134, 168 132 Z"
+          fill="#f6f4ec"/>
+
+    <!-- wing -->
+    <path d="M161 168
+             C171 147, 195 139, 217 148
+             C221 171, 209 196, 183 209
+             C163 205, 151 190, 152 176
+             C153 173, 156 170, 161 168 Z"
+          fill="url(#toucanWing)"/>
+
+    <!-- neck/head -->
+    <circle cx="212" cy="124" r="46" fill="url(#toucanBody)"/>
+
+    <!-- throat connection -->
+    <path d="M192 147 C191 132, 202 120, 220 117 C227 130, 226 146, 217 156 C206 156, 197 153, 192 147 Z"
+          fill="#f6f4ec"/>
+
+    <!-- eye ring -->
+    <circle cx="220" cy="116" r="13" fill="#7fd3ff"/>
+    <circle cx="220" cy="116" r="9" fill="#ffffff"/>
+    <circle cx="222" cy="116" r="5" fill="#111111"/>
+    <circle cx="224" cy="114" r="1.8" fill="#ffffff"/>
+
+    <!-- beak -->
+    <g class="toucan-beak">
+      <!-- upper beak -->
+      <path d="M232 106
+               C256 83, 303 70, 358 77
+               C383 80, 396 89, 397 102
+               C395 118, 372 129, 334 136
+               C292 143, 256 140, 228 130
+               C224 121, 225 112, 232 106 Z"
+            fill="url(#toucanBeakTop)"
+            stroke="#c26c24"
+            stroke-width="3"
+            stroke-linejoin="round"/>
+
+      <!-- lower beak -->
+      <path d="M230 131
+               C269 140, 324 141, 383 124
+               C376 147, 349 160, 307 163
+               C271 166, 241 160, 224 147
+               C222 141, 224 135, 230 131 Z"
+            fill="url(#toucanBeakBottom)"
+            stroke="#cf7328"
+            stroke-width="2.5"
+            stroke-linejoin="round"/>
+
+      <!-- beak line -->
+      <path d="M233 130 C275 136, 328 134, 385 122"
+            fill="none"
+            stroke="#d97f2d"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            opacity="0.9"/>
+
+      <!-- nostril -->
+      <ellipse cx="255" cy="99" rx="5.5" ry="3.5" fill="#2f3a32" opacity="0.45"/>
+
+      <!-- beak highlight -->
+      <path d="M247 96 C281 82, 336 82, 375 94"
+            fill="none"
+            stroke="#fff2aa"
+            stroke-width="4"
+            stroke-linecap="round"
+            opacity="0.65"/>
+    </g>
+
+    <!-- legs -->
+    <path d="M170 235 L165 258" stroke="#3f2b1f" stroke-width="5" stroke-linecap="round"/>
+    <path d="M198 236 L203 258" stroke="#3f2b1f" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- claws -->
+    <path d="M165 258 C155 253, 147 253, 138 259" fill="none" stroke="#3f2b1f" stroke-width="5" stroke-linecap="round"/>
+    <path d="M165 258 C173 253, 180 253, 188 259" fill="none" stroke="#3f2b1f" stroke-width="5" stroke-linecap="round"/>
+    <path d="M203 258 C193 253, 185 253, 176 259" fill="none" stroke="#3f2b1f" stroke-width="5" stroke-linecap="round"/>
+    <path d="M203 258 C211 253, 218 253, 226 259" fill="none" stroke="#3f2b1f" stroke-width="5" stroke-linecap="round"/>
+  </svg>
+</div>
+
+<style>
+  .toucan-wrap {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    width: 220px;
+    z-index: 30;
+    pointer-events: none;
+    animation: toucanFloat 4s ease-in-out infinite;
+  }
+
+  .toucan-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .toucan-beak {
+    transform-origin: 230px 130px;
+    animation: toucanBeakMove 5.5s ease-in-out infinite;
+  }
+
+  @keyframes toucanFloat {
+    0%, 100% { transform: translateY(0px) rotate(-1deg); }
+    50% { transform: translateY(-8px) rotate(1deg); }
+  }
+
+  @keyframes toucanBeakMove {
+    0%, 100% { transform: rotate(0deg); }
+    48% { transform: rotate(0deg); }
+    52% { transform: rotate(2deg); }
+    56% { transform: rotate(0deg); }
+  }
+</style>

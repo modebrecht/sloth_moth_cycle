@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animated Jungle Background SVG</title>
+  <style>
+    :root {
+      --bg-0: #031711;
+      --bg-1: #083325;
+      --bg-2: #176448;
+      --leaf-dark: #06381f;
+      --leaf-mid: #0b6b3f;
+      --leaf-light: #1ec878;
+      --glow: #dfff91;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #031711;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .jungle-bg {
+      width: min(100vw, 1920px);
+      height: min(100vh, 1080px);
+      aspect-ratio: 16 / 9;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 40% 18%, rgba(115, 218, 153, .33) 0 6%, rgba(75, 176, 126, .20) 12%, transparent 38%),
+        radial-gradient(circle at 73% 64%, rgba(29, 128, 85, .25) 0 10%, transparent 34%),
+        radial-gradient(circle at 18% 78%, rgba(21, 99, 62, .33) 0 8%, transparent 34%),
+        linear-gradient(135deg, var(--bg-2) 0%, var(--bg-1) 35%, var(--bg-0) 100%);
+      filter: saturate(1.08) contrast(1.04);
+    }
+
+    .jungle-bg::before,
+    .jungle-bg::after {
+      content: "";
+      position: absolute;
+      inset: -18%;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .jungle-bg::before {
+      background:
+        radial-gradient(circle at 33% 26%, rgba(130, 231, 163, .18) 0 4%, transparent 22%),
+        radial-gradient(circle at 61% 36%, rgba(32, 126, 90, .12) 0 5%, transparent 28%),
+        radial-gradient(circle at 80% 15%, rgba(70, 180, 109, .08) 0 7%, transparent 26%);
+      animation: mistDrift 18s ease-in-out infinite alternate;
+    }
+
+    .jungle-bg::after {
+      background:
+        radial-gradient(circle at 50% 50%, transparent 0 45%, rgba(0, 0, 0, .42) 76%, rgba(0, 0, 0, .68) 100%);
+      mix-blend-mode: multiply;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+
+    .soft-layer { filter: url(#softBlur); opacity: .58; }
+    .mid-layer { opacity: .72; }
+    .front-layer { opacity: .96; }
+
+    .left-foliage {
+      transform-origin: 12% 72%;
+      animation: leftBreath 9s ease-in-out infinite;
+    }
+
+    .right-vine {
+      transform-origin: 86% 0%;
+      animation: vineSway 7.5s ease-in-out infinite;
+    }
+
+    .leaf-sway-a { transform-origin: 88% 48%; animation: leafSwayA 5.8s ease-in-out infinite; }
+    .leaf-sway-b { transform-origin: 87% 61%; animation: leafSwayB 6.4s ease-in-out infinite; }
+    .leaf-sway-c { transform-origin: 84% 73%; animation: leafSwayA 7s ease-in-out infinite reverse; }
+
+    .glow-dot {
+      filter: url(#glow);
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: fireflyPulse 3.6s ease-in-out infinite;
+    }
+    .glow-dot:nth-of-type(2n) { animation-delay: -1.2s; }
+    .glow-dot:nth-of-type(3n) { animation-delay: -2.1s; }
+
+    .firefly {
+      filter: url(#glowStrong);
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: fireflyFloat 10s ease-in-out infinite, fireflyPulse 2.7s ease-in-out infinite;
+    }
+    .firefly.f2 { animation-delay: -2s, -.6s; }
+    .firefly.f3 { animation-delay: -4s, -1.4s; }
+    .firefly.f4 { animation-delay: -6s, -.9s; }
+    .firefly.f5 { animation-delay: -8s, -1.8s; }
+
+    @keyframes mistDrift {
+      from { transform: translate3d(-2%, -1%, 0) scale(1); opacity: .82; }
+      to   { transform: translate3d(2.5%, 1.5%, 0) scale(1.03); opacity: 1; }
+    }
+
+    @keyframes leftBreath {
+      0%, 100% { transform: translateX(0) rotate(0deg) scale(1); }
+      50%      { transform: translateX(-10px) rotate(-.7deg) scale(1.015); }
+    }
+
+    @keyframes vineSway {
+      0%, 100% { transform: rotate(.4deg) translateX(0); }
+      50%      { transform: rotate(-1.5deg) translateX(-8px); }
+    }
+
+    @keyframes leafSwayA {
+      0%, 100% { transform: rotate(0deg) translateY(0); }
+      50%      { transform: rotate(2.5deg) translateY(-4px); }
+    }
+
+    @keyframes leafSwayB {
+      0%, 100% { transform: rotate(0deg) translateY(0); }
+      50%      { transform: rotate(-2deg) translateY(3px); }
+    }
+
+    @keyframes fireflyPulse {
+      0%, 100% { opacity: .25; transform: scale(.75); }
+      50%      { opacity: 1; transform: scale(1.22); }
+    }
+
+    @keyframes fireflyFloat {
+      0%, 100% { translate: 0 0; }
+      25%      { translate: 10px -16px; }
+      50%      { translate: -7px -26px; }
+      75%      { translate: 13px -10px; }
+    }
+
+    @media (max-aspect-ratio: 16/9) {
+      .jungle-bg { width: 100vw; height: auto; }
+    }
+
+    @media (min-aspect-ratio: 16/9) {
+      .jungle-bg { width: auto; height: 100vh; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="jungle-bg" aria-label="Animierter Dschungel-Hintergrund">
+    <svg viewBox="0 0 1920 1080" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="centerBloom" cx="43%" cy="19%" r="68%">
+          <stop offset="0" stop-color="#83e5a5" stop-opacity="0.30" />
+          <stop offset="0.28" stop-color="#2f9b6a" stop-opacity="0.18" />
+          <stop offset="0.72" stop-color="#05241a" stop-opacity="0.04" />
+          <stop offset="1" stop-color="#010907" stop-opacity="0.56" />
+        </radialGradient>
+
+        <linearGradient id="leafA" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#23a968" stop-opacity="0.72" />
+          <stop offset="0.52" stop-color="#0b673d" stop-opacity="0.56" />
+          <stop offset="1" stop-color="#052619" stop-opacity="0.36" />
+        </linearGradient>
+
+        <linearGradient id="leafB" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#179b5b" stop-opacity="0.96" />
+          <stop offset="0.62" stop-color="#0a5b34" stop-opacity="0.88" />
+          <stop offset="1" stop-color="#042319" stop-opacity="0.78" />
+        </linearGradient>
+
+        <linearGradient id="vineGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#28cf7a" stop-opacity="0.88" />
+          <stop offset="0.45" stop-color="#19a965" stop-opacity="0.82" />
+          <stop offset="1" stop-color="#12864f" stop-opacity="0.75" />
+        </linearGradient>
+
+        <filter id="softBlur" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="9" />
+        </filter>
+
+        <filter id="glow" x="-180%" y="-180%" width="460%" height="460%">
+          <feGaussianBlur stdDeviation="5" result="blur" />
+          <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.75  0 1 0 0 1  0 0 1 0 0.35  0 0 0 .85 0" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+
+        <filter id="glowStrong" x="-250%" y="-250%" width="600%" height="600%">
+          <feGaussianBlur stdDeviation="7" result="blur" />
+          <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.9  0 1 0 0 1  0 0 1 0 0.28  0 0 0 1 0" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+
+        <path id="leafShape" d="M0,68 C56,-12 164,-20 244,50 C158,77 90,135 14,148 C2,118 -6,91 0,68Z" />
+        <path id="smallLeaf" d="M3,47 C44,-7 116,-11 168,39 C107,57 68,98 9,105 C-2,82 -3,63 3,47Z" />
+      </defs>
+
+      <rect width="1920" height="1080" fill="url(#centerBloom)" />
+
+      <g class="soft-layer left-foliage">
+        <use href="#leafShape" x="-56" y="86" transform="scale(1.42) rotate(-9 80 150)" fill="url(#leafA)" />
+        <use href="#leafShape" x="122" y="360" transform="scale(1.58) rotate(-12 210 480)" fill="url(#leafA)" opacity=".8" />
+        <use href="#leafShape" x="28" y="668" transform="scale(1.34) rotate(-7 190 740)" fill="url(#leafA)" opacity=".72" />
+        <use href="#leafShape" x="478" y="714" transform="scale(1.7) rotate(-17 560 810)" fill="url(#leafA)" opacity=".45" />
+        <path d="M48 639 C156 537 198 372 180 163" fill="none" stroke="#3ec887" stroke-width="13" stroke-linecap="round" opacity=".12" />
+        <path d="M126 874 C184 758 300 710 472 695" fill="none" stroke="#50e196" stroke-width="10" stroke-linecap="round" opacity=".07" />
+      </g>
+
+      <g class="soft-layer" opacity=".42">
+        <use href="#leafShape" x="705" y="742" transform="scale(1.86) rotate(-4 840 820)" fill="url(#leafA)" />
+        <use href="#leafShape" x="1296" y="635" transform="scale(1.48) rotate(7 1430 760)" fill="url(#leafA)" opacity=".32" />
+      </g>
+
+      <g class="mid-layer">
+        <circle class="glow-dot" cx="354" cy="315" r="3.2" fill="#e7ff99" opacity=".55" />
+        <circle class="glow-dot" cx="579" cy="336" r="6.2" fill="#dfff91" opacity=".48" />
+        <circle class="glow-dot" cx="597" cy="481" r="2.6" fill="#dfff91" opacity=".45" />
+        <circle class="glow-dot" cx="1028" cy="169" r="4" fill="#eaff9c" opacity=".62" />
+        <circle class="glow-dot" cx="1069" cy="752" r="3" fill="#eaff9c" opacity=".48" />
+        <circle class="glow-dot" cx="1196" cy="908" r="5" fill="#eaff9c" opacity=".62" />
+        <circle class="glow-dot" cx="1364" cy="359" r="3.6" fill="#eaff9c" opacity=".5" />
+        <circle class="glow-dot" cx="1410" cy="572" r="5" fill="#eaff9c" opacity=".56" />
+        <circle class="glow-dot" cx="622" cy="817" r="6.5" fill="#eaff9c" opacity=".54" />
+        <circle class="firefly f1" cx="1460" cy="940" r="7" fill="#dcff83" opacity=".56" />
+        <circle class="firefly f2" cx="728" cy="874" r="5" fill="#e8ff9c" opacity=".44" />
+        <circle class="firefly f3" cx="1542" cy="732" r="4" fill="#e8ff9c" opacity=".48" />
+        <circle class="firefly f4" cx="212" cy="806" r="4" fill="#e8ff9c" opacity=".37" />
+        <circle class="firefly f5" cx="1291" cy="255" r="3.6" fill="#e8ff9c" opacity=".48" />
+      </g>
+
+      <g class="front-layer right-vine">
+        <path d="M1698 -48 C1690 167 1675 331 1684 505 C1692 670 1664 819 1730 962" fill="none" stroke="url(#vineGrad)" stroke-width="13" stroke-linecap="round" opacity=".9" />
+        <path d="M1697 -35 C1687 144 1680 308 1687 509 C1692 660 1669 810 1722 943" fill="none" stroke="#74ffad" stroke-width="3" stroke-linecap="round" opacity=".26" />
+
+        <g class="leaf-sway-a">
+          <use href="#leafShape" x="1484" y="122" transform="scale(1.5) rotate(8 1605 230)" fill="url(#leafB)" />
+          <path d="M1565 333 C1637 274 1714 239 1848 246" fill="none" stroke="#041a12" stroke-width="11" stroke-linecap="round" opacity=".25" />
+        </g>
+
+        <g class="leaf-sway-b">
+          <use href="#leafShape" x="1454" y="383" transform="scale(1.43) rotate(-8 1570 510)" fill="url(#leafB)" opacity=".92" />
+          <use href="#smallLeaf" x="1630" y="326" transform="scale(1.1) rotate(10 1690 390)" fill="url(#leafB)" opacity=".82" />
+        </g>
+
+        <g class="leaf-sway-c">
+          <use href="#smallLeaf" x="1470" y="700" transform="scale(1.34) rotate(-8 1530 770)" fill="#21bf73" opacity=".95" />
+          <path d="M1494 804 C1556 762 1600 741 1681 733" fill="none" stroke="#052417" stroke-width="7" stroke-linecap="round" opacity=".25" />
+          <use href="#smallLeaf" x="1693" y="671" transform="scale(1.2) rotate(-12 1760 760)" fill="url(#leafB)" opacity=".86" />
+        </g>
+      </g>
+
+      <g opacity=".24" filter="url(#softBlur)">
+        <ellipse cx="165" cy="1010" rx="260" ry="82" fill="#00100b" />
+        <ellipse cx="1770" cy="1000" rx="300" ry="95" fill="#000d09" />
+      </g>
+    </svg>
+  </main>
+</body>
+</html>
