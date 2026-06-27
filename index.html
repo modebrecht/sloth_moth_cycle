@@ -1789,6 +1789,19 @@
       .watch-prompts{grid-template-columns:1fr;gap:8px;}
     }
 
+    /* Reusable animated jungle from assets/background.html */
+    .jungle-background-layer{position:fixed;inset:0;z-index:0;width:100%;height:100%;border:0;pointer-events:none;opacity:.4;transition:opacity .25s ease;}
+    body:not(.print-view) .app{position:relative;z-index:1;}
+    body:not(.print-view) .slide{background:rgba(255,253,247,var(--slide-surface-opacity,.75))!important;}
+    .visual-options{position:fixed;right:max(12px,calc((100vw - 1220px)/2 + 12px));bottom:64px;z-index:160;width:min(290px,calc(100vw - 24px));padding:16px;border-radius:18px;background:rgba(18,50,38,.94);border:1px solid rgba(255,255,255,.28);box-shadow:0 18px 44px rgba(0,0,0,.28);backdrop-filter:blur(20px);color:white;}
+    .visual-options[hidden]{display:none!important;}
+    .visual-options strong{display:block;margin-bottom:12px;}
+    .visual-option-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:10px;font-weight:750;}
+    .visual-option-row input[type="range"]{flex:1;min-width:90px;accent-color:#ffcc66;}
+    .visual-option-row input[type="checkbox"]{width:19px;height:19px;accent-color:#6fcf7d;}
+    #visualOptionsBtn{padding:5px 9px!important;min-width:30px;}
+    body.print-view .jungle-background-layer,body.print-view .visual-options{display:none!important;}
+
     /* Stable application shell: controls occupy their own rows instead of
        covering the slide. Keep this final so legacy tuning above cannot
        reintroduce the fixed overlay layout. */
@@ -1843,6 +1856,9 @@
       body:not(.print-view) .top-inner{
         grid-template-columns:minmax(0,1fr)!important;
       }
+      body:not(.print-view) .bottom-inner{
+        grid-template-columns:auto minmax(0,1fr) auto auto!important;
+      }
       body:not(.print-view) .slide{
         padding:20px 14px!important;
         border-radius:20px!important;
@@ -1851,6 +1867,7 @@
 </style>
 </head>
 <body>
+<iframe aria-hidden="true" class="jungle-background-layer" id="jungleBackground" src="assets/background.html" tabindex="-1" title=""></iframe>
 <div aria-hidden="true" class="fx-layer" id="fxLayer"></div>
 <div aria-hidden="true" class="juice-hud">
 <div class="juice-chip">⚡ XP <strong id="xpValue">0</strong></div>
@@ -2418,8 +2435,15 @@
 <div class="bottom-inner">
 <button class="ghost" onclick="prevSlide()">← Back</button>
 <div aria-label="slide navigation" class="dots" id="dots"></div>
-<button onclick="nextSlide()">Next →</button>
+<button id="nextBtn" onclick="nextSlide()">Next →</button>
+<button aria-controls="visualOptions" aria-expanded="false" class="plain" id="visualOptionsBtn" onclick="toggleVisualOptions()" title="Visual options" type="button">⚙️</button>
 <div class="footer-note">← → · swipe · double tap images 💚</div>
+</div>
+<div class="visual-options" hidden id="visualOptions">
+<strong>Visual options</strong>
+<label class="visual-option-row"><span>Moving jungle</span><input checked id="backgroundEnabled" type="checkbox"/></label>
+<label class="visual-option-row"><span>Background</span><input id="backgroundOpacity" max="100" min="0" step="5" type="range" value="40"/><output id="backgroundOpacityValue">40%</output></label>
+<label class="visual-option-row"><span>White slides</span><input id="slideOpacity" max="100" min="0" step="5" type="range" value="75"/><output id="slideOpacityValue">75%</output></label>
 </div>
 </footer>
 </div>
@@ -2891,7 +2915,7 @@
       if(counter) counter.textContent = `Slide ${current + 1} / ${slides.length}`;
       const fill = document.getElementById('slideFill');
       if(fill) fill.style.width = `${((current + 1) / slides.length) * 100}%`;
-      const nextBtn = document.querySelector('.bottom-inner > button:last-of-type');
+      const nextBtn = document.getElementById('nextBtn');
       if(nextBtn){
         const target = Math.min(slides.length - 1, current + 1);
         const need = neededXPForSlide(target);
@@ -3229,6 +3253,73 @@
     });
   }
   setupGapQuiz(); setupOrderQuiz();
+})();
+</script>
+<script>
+(() => {
+  const STORAGE_KEY = 'slothMothVisualOptions_v2';
+  const background = document.getElementById('jungleBackground');
+  const panel = document.getElementById('visualOptions');
+  const button = document.getElementById('visualOptionsBtn');
+  const enabledInput = document.getElementById('backgroundEnabled');
+  const opacityInput = document.getElementById('backgroundOpacity');
+  const opacityValue = document.getElementById('backgroundOpacityValue');
+  const slideOpacityInput = document.getElementById('slideOpacity');
+  const slideOpacityValue = document.getElementById('slideOpacityValue');
+
+  let settings = { enabled: true, opacity: 40, slideOpacity: 75 };
+  try {
+    settings = { ...settings, ...JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') };
+  } catch(e) {}
+
+  function applyVisualSettings(){
+    const rawOpacity = Number(settings.opacity);
+    const rawSlideOpacity = Number(settings.slideOpacity);
+    const opacity = Math.max(0, Math.min(100, Number.isFinite(rawOpacity) ? rawOpacity : 40));
+    const slideOpacity = Math.max(0, Math.min(100, Number.isFinite(rawSlideOpacity) ? rawSlideOpacity : 75));
+    background.hidden = !settings.enabled;
+    background.style.opacity = String(opacity / 100);
+    document.documentElement.style.setProperty('--slide-surface-opacity', String(slideOpacity / 100));
+    enabledInput.checked = settings.enabled;
+    opacityInput.value = String(opacity);
+    opacityInput.disabled = !settings.enabled;
+    opacityValue.value = `${opacity}%`;
+    slideOpacityInput.value = String(slideOpacity);
+    slideOpacityValue.value = `${slideOpacity}%`;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled: settings.enabled, opacity, slideOpacity })); } catch(e) {}
+  }
+
+  window.toggleVisualOptions = function(){
+    const willOpen = panel.hidden;
+    panel.hidden = !willOpen;
+    button.setAttribute('aria-expanded', String(willOpen));
+  };
+
+  enabledInput.addEventListener('change', () => {
+    settings.enabled = enabledInput.checked;
+    applyVisualSettings();
+  });
+  opacityInput.addEventListener('input', () => {
+    settings.opacity = Number(opacityInput.value);
+    applyVisualSettings();
+  });
+  slideOpacityInput.addEventListener('input', () => {
+    settings.slideOpacity = Number(slideOpacityInput.value);
+    applyVisualSettings();
+  });
+  document.addEventListener('click', event => {
+    if(panel.hidden || panel.contains(event.target) || button.contains(event.target)) return;
+    panel.hidden = true;
+    button.setAttribute('aria-expanded', 'false');
+  });
+  document.addEventListener('keydown', event => {
+    if(event.key !== 'Escape' || panel.hidden) return;
+    panel.hidden = true;
+    button.setAttribute('aria-expanded', 'false');
+    button.focus();
+  });
+
+  applyVisualSettings();
 })();
 </script>
 </body>
