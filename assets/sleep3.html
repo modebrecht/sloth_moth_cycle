@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HD Stunning Sloth - Eating</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #030B09;
+            font-family: sans-serif;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="slothCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('slothCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height, cx, cy;
+    let time = 0;
+    const particles = [];
+
+    // Colors
+    const colors = {
+        bgGlow: '#143628',
+        bgDark: '#030B09',
+        branch: '#3E2723',
+        branchLight: '#4E342E',
+        slothDark: '#4A2F1D',
+        slothMid: '#6B442A',
+        slothLight: '#8A5A3B',
+        face: '#E8DAC3',
+        eyePatch: '#3B2313',
+        nose: '#1A110B',
+        claws: '#B0BEC5',
+        leaves: '#0D2117',
+        snackLeaf: '#558B2F',
+        snackStem: '#8BC34A'
+    };
+
+    // Initialize canvas for HD displays
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        cx = width / 2;
+        cy = height / 2;
+        
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.scale(dpr, dpr);
+    }
+
+    // Particle system
+    class Particle {
+        constructor() {
+            this.reset();
+            this.y = Math.random() * height;
+        }
+        reset() {
+            this.x = Math.random() * width;
+            this.y = height + 50;
+            this.size = Math.random() * 2.5 + 0.5;
+            this.speedY = -(Math.random() * 0.5 + 0.1);
+            this.speedX = (Math.random() - 0.5) * 0.5;
+            this.opacity = Math.random() * 0.5 + 0.1;
+            this.blinkSpeed = Math.random() * 0.02 + 0.01;
+            this.offset = Math.random() * Math.PI * 2;
+        }
+        update() {
+            this.y += this.speedY;
+            this.x += this.speedX + Math.sin(time * 2 + this.offset) * 0.2;
+            if (this.y < -50) this.reset();
+        }
+        draw() {
+            const currentOpacity = this.opacity + Math.sin(time * this.blinkSpeed * 100) * 0.2;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(164, 255, 168, ${Math.max(0, currentOpacity)})`;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#A4FFA8';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+    }
+
+    function initParticles() {
+        for (let i = 0; i < 80; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    // Helper Drawing Functions
+    function drawBackground() {
+        const gradient = ctx.createRadialGradient(cx, cy - 100, 0, cx, cy, Math.max(width, height));
+        gradient.addColorStop(0, colors.bgGlow);
+        gradient.addColorStop(1, colors.bgDark);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+    }
+
+    function drawLimb(startX, startY, endX, endY, width, color) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.quadraticCurveTo(startX + (endX - startX) / 2, startY + 10, endX, endY);
+        ctx.stroke();
+    }
+
+    function drawClaws(x, y, rotation) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+        ctx.strokeStyle = colors.claws;
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        
+        for(let i = -1; i <= 1; i++) {
+            ctx.beginPath();
+            ctx.moveTo(i * 11, -10); 
+            ctx.quadraticCurveTo(i * 13, 10, i * 8, 25); 
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    function drawForegroundLeaves() {
+        ctx.fillStyle = colors.leaves;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        
+        ctx.beginPath();
+        ctx.moveTo(0, height);
+        ctx.quadraticCurveTo(150, height - 100, 200, height);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(0, height);
+        ctx.quadraticCurveTo(50, height - 250, 0, height - 300);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(width, 0);
+        ctx.quadraticCurveTo(width - 200, 50, width, 150);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    }
+
+    function drawSnack(x, y, rotation, chewAmount) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation + chewAmount * 0.05); // Leaf tugs slightly when chewed
+        
+        // Stem
+        ctx.strokeStyle = colors.snackStem;
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(15, -10, 40, -5);
+        ctx.stroke();
+
+        // Leaves
+        ctx.fillStyle = colors.snackLeaf;
+        
+        // Leaf 1
+        ctx.beginPath();
+        ctx.ellipse(25, -5, 12, 6, Math.PI / 6, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Leaf 2 (Half eaten / closer to mouth)
+        ctx.beginPath();
+        ctx.ellipse(10, -8, 10, 5, -Math.PI / 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Bite marks on leaf 2
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(8, -12, 4, 0, Math.PI * 2);
+        ctx.arc(14, -10, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+
+        ctx.restore();
+    }
+
+    // Unified Scene Rendering
+    function drawScene() {
+        // Chewing rhythm (0 to 1, smoothing out the peaks)
+        const chewRhythm = Math.max(0, Math.sin(time * 5)); 
+        const breathScale = 1 + Math.sin(time * 1.5) * 0.015;
+
+        ctx.save();
+        ctx.translate(cx, cy - 50); 
+        ctx.translate(0, Math.sin(time) * 4);
+        ctx.rotate(0.15); 
+
+        // 1. BACK LIMBS
+        drawLimb(30, 90, 60, -35, 35, colors.slothDark); // Back arm
+        drawLimb(-50, 80, -70, -35, 40, colors.slothDark); // Back leg
+
+        // 2. MAIN BRANCH
+        ctx.shadowBlur = 30;
+        ctx.shadowColor = 'rgba(0,0,0,0.6)';
+        ctx.fillStyle = colors.branch;
+        ctx.beginPath();
+        ctx.rect(-width*1.5, -40, width*3, 80);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        ctx.strokeStyle = colors.branchLight;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(-width, -10);
+        ctx.bezierCurveTo(-width/2, 10, width/2, -20, width, 0);
+        ctx.stroke();
+
+        // 3. BACK CLAWS (Hooking over branch)
+        drawClaws(60, -35, 0.05);
+        drawClaws(-70, -35, -0.05);
+
+        // 4. BODY
+        ctx.save();
+        ctx.scale(1, breathScale);
+        ctx.fillStyle = colors.slothMid;
+        ctx.beginPath();
+        ctx.ellipse(0, 75, 110, 75, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        const bodyGradient = ctx.createLinearGradient(0, 0, 0, 150);
+        bodyGradient.addColorStop(0, colors.slothLight);
+        bodyGradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = bodyGradient;
+        ctx.beginPath();
+        ctx.ellipse(0, 65, 90, 60, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // 5. FRONT LEG (Still holding the branch)
+        drawLimb(-30, 80, -30, -35, 45, colors.slothLight); 
+        drawClaws(-30, -35, -0.05);
+
+        // 6. EATING ARM & SNACK
+        // Hand is brought close to the mouth
+        const handX = 70;
+        const handY = 35 + Math.sin(time * 5) * 1; // Subtle arm movement with chew
+        
+        drawLimb(40, 80, handX, handY, 40, colors.slothLight); 
+        
+        // Draw the leaf branch in the hand
+        drawSnack(handX, handY, -0.2, chewRhythm);
+
+        // Draw smaller claws gripping the leaf twig
+        ctx.save();
+        ctx.translate(handX, handY);
+        ctx.rotate(1.5);
+        ctx.strokeStyle = colors.claws;
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        for(let i = -1; i <= 1; i++) {
+            ctx.beginPath();
+            ctx.moveTo(i * 8, -5); 
+            ctx.quadraticCurveTo(i * 10, 5, i * 6, 12); 
+            ctx.stroke();
+        }
+        ctx.restore();
+
+        // 7. HEAD
+        ctx.save();
+        ctx.translate(85, 40 + Math.sin(time * 1.5) * 2); 
+        
+        // Head base
+        ctx.fillStyle = colors.slothMid;
+        ctx.beginPath();
+        ctx.arc(0, 0, 55, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Face plate
+        ctx.fillStyle = colors.face;
+        ctx.beginPath();
+        ctx.ellipse(5, 5, 45, 40, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eye patches
+        ctx.fillStyle = colors.eyePatch;
+        ctx.beginPath();
+        ctx.ellipse(-15, 0, 18, 12, -Math.PI / 5, 0, Math.PI * 2);
+        ctx.ellipse(25, 5, 18, 12, Math.PI / 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Sleepy, half-open eyes
+        ctx.fillStyle = '#111'; // Pupil
+        ctx.beginPath();
+        ctx.arc(-15, 2, 3, 0, Math.PI * 2);
+        ctx.arc(25, 6, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eyelids (making them look sleepy)
+        ctx.fillStyle = colors.eyePatch;
+        ctx.beginPath();
+        ctx.ellipse(-15, -2, 19, 6, -Math.PI / 5, 0, Math.PI * 2);
+        ctx.ellipse(25, 1, 19, 6, Math.PI / 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Nose
+        ctx.fillStyle = colors.nose;
+        ctx.beginPath();
+        ctx.ellipse(8, 18, 8, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Chewing Mouth
+        // Open dark mouth background
+        ctx.fillStyle = '#2A1A1A';
+        ctx.beginPath();
+        ctx.ellipse(8, 26, 10, 2 + chewRhythm * 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Smile lines/lips moving up and down
+        ctx.strokeStyle = colors.nose;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        // Lower lip moves down based on chewRhythm
+        ctx.quadraticCurveTo(8, 25 + chewRhythm * 6, 18, 23);
+        ctx.stroke();
+
+        ctx.restore(); // End Head
+        ctx.restore(); // End Scene
+    }
+
+    // Animation Loop
+    function animate() {
+        time += 0.01;
+        
+        ctx.clearRect(0, 0, width, height);
+        
+        drawBackground();
+        
+        particles.forEach(p => {
+            if(p.size < 1.5) {
+                p.update();
+                p.draw();
+            }
+        });
+
+        drawScene();
+        
+        particles.forEach(p => {
+            if(p.size >= 1.5) {
+                p.update();
+                p.draw();
+            }
+        });
+
+        drawForegroundLeaves();
+
+        requestAnimationFrame(animate);
+    }
+
+    // Boot up
+    window.addEventListener('resize', resize);
+    resize();
+    initParticles();
+    animate();
+
+</script>
+</body>
+</html>

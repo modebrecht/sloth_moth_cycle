@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HD Stunning Sloth</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #030B09;
+            font-family: sans-serif;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="slothCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('slothCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height, cx, cy;
+    let time = 0;
+    const particles = [];
+
+    // Colors
+    const colors = {
+        bgGlow: '#143628',
+        bgDark: '#030B09',
+        branch: '#3E2723',
+        branchLight: '#4E342E',
+        slothDark: '#4A2F1D',
+        slothMid: '#6B442A',
+        slothLight: '#8A5A3B',
+        face: '#E8DAC3',
+        eyePatch: '#3B2313',
+        nose: '#1A110B',
+        claws: '#B0BEC5',
+        leaves: '#0D2117'
+    };
+
+    // Initialize canvas for HD displays (Retina/High-DPI)
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        cx = width / 2;
+        cy = height / 2;
+        
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.scale(dpr, dpr);
+    }
+
+    // Particle system for magical jungle atmosphere
+    class Particle {
+        constructor() {
+            this.reset();
+            this.y = Math.random() * height; // Distribute initially
+        }
+        reset() {
+            this.x = Math.random() * width;
+            this.y = height + 50;
+            this.size = Math.random() * 2.5 + 0.5;
+            this.speedY = -(Math.random() * 0.5 + 0.1);
+            this.speedX = (Math.random() - 0.5) * 0.5;
+            this.opacity = Math.random() * 0.5 + 0.1;
+            this.blinkSpeed = Math.random() * 0.02 + 0.01;
+            this.offset = Math.random() * Math.PI * 2;
+        }
+        update() {
+            this.y += this.speedY;
+            this.x += this.speedX + Math.sin(time * 2 + this.offset) * 0.2;
+            if (this.y < -50) this.reset();
+        }
+        draw() {
+            const currentOpacity = this.opacity + Math.sin(time * this.blinkSpeed * 100) * 0.2;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(164, 255, 168, ${Math.max(0, currentOpacity)})`;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#A4FFA8';
+            ctx.fill();
+            ctx.shadowBlur = 0; // reset
+        }
+    }
+
+    function initParticles() {
+        for (let i = 0; i < 80; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    // Drawing functions
+    function drawBackground() {
+        const gradient = ctx.createRadialGradient(cx, cy - 100, 0, cx, cy, Math.max(width, height));
+        gradient.addColorStop(0, colors.bgGlow);
+        gradient.addColorStop(1, colors.bgDark);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+    }
+
+    function drawBranch() {
+        ctx.save();
+        ctx.translate(cx, cy - 50);
+        ctx.rotate(0.15); // Slight angle
+
+        // Main branch
+        ctx.shadowBlur = 30;
+        ctx.shadowColor = 'rgba(0,0,0,0.6)';
+        ctx.fillStyle = colors.branch;
+        ctx.beginPath();
+        ctx.moveTo(-width, -30);
+        ctx.lineTo(width, -40);
+        ctx.lineTo(width, 40);
+        ctx.lineTo(-width, 30);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Texture/Highlights
+        ctx.strokeStyle = colors.branchLight;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(-width, -10);
+        ctx.bezierCurveTo(-width/2, 10, width/2, -20, width, 0);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    function drawClaws(x, y, rotation) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+        ctx.strokeStyle = colors.claws;
+        ctx.lineWidth = 6;
+        ctx.lineCap = 'round';
+        
+        for(let i = -1; i <= 1; i++) {
+            ctx.beginPath();
+            ctx.moveTo(i * 12, 0);
+            ctx.quadraticCurveTo(i * 12, -25, i * 14, -35);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    function drawLimb(startX, startY, endX, endY, width, color) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.quadraticCurveTo(startX + (endX - startX) / 2, startY + 50, endX, endY);
+        ctx.stroke();
+    }
+
+    function drawSloth() {
+        const breathScale = 1 + Math.sin(time * 2) * 0.02; // Breathing animation
+        const branchY = cy - 50 + cx * Math.sin(0.15); // Approximate branch intersection
+
+        ctx.save();
+        ctx.translate(cx, branchY + 10); // Anchor sloth to branch
+
+        // Shadow for depth
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+
+        // Back Arm (Behind Body)
+        drawLimb(30, 80, 70, -20, 35, colors.slothDark);
+        drawClaws(70, -30, 0.2);
+
+        // Back Leg
+        drawLimb(-60, 70, -80, -10, 40, colors.slothDark);
+        drawClaws(-80, -20, -0.1);
+
+        // Body (with breathing scale)
+        ctx.save();
+        ctx.scale(1, breathScale);
+        ctx.fillStyle = colors.slothMid;
+        ctx.beginPath();
+        ctx.ellipse(0, 70, 110, 75, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Body fur highlight
+        const bodyGradient = ctx.createLinearGradient(0, 0, 0, 140);
+        bodyGradient.addColorStop(0, colors.slothLight);
+        bodyGradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = bodyGradient;
+        ctx.beginPath();
+        ctx.ellipse(0, 60, 90, 60, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Front Leg
+        drawLimb(-30, 80, -40, -15, 45, colors.slothLight);
+        drawClaws(-40, -25, 0);
+
+        // Front Arm
+        drawLimb(60, 70, 20, -25, 45, colors.slothLight);
+        drawClaws(20, -35, 0.1);
+
+        // Head
+        ctx.save();
+        ctx.translate(85, 30 + Math.sin(time * 2) * 2); // Head bobs slightly with breath
+        
+        // Head Base
+        ctx.fillStyle = colors.slothMid;
+        ctx.beginPath();
+        ctx.arc(0, 0, 55, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Face Plate
+        ctx.fillStyle = colors.face;
+        ctx.beginPath();
+        ctx.ellipse(5, 5, 45, 40, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eye Patches
+        ctx.fillStyle = colors.eyePatch;
+        ctx.beginPath();
+        ctx.ellipse(-15, 0, 18, 12, -Math.PI / 5, 0, Math.PI * 2);
+        ctx.ellipse(25, 5, 18, 12, Math.PI / 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Sleepy Eyes (Closed arcs)
+        ctx.strokeStyle = '#111';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(-15, 2, 8, Math.PI * 0.1, Math.PI * 0.9);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(25, 7, 8, Math.PI * 0.1, Math.PI * 0.9);
+        ctx.stroke();
+
+        // Nose
+        ctx.fillStyle = colors.nose;
+        ctx.beginPath();
+        ctx.ellipse(8, 20, 8, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Peaceful Smile
+        ctx.strokeStyle = colors.nose;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(8, 24, 12, Math.PI * 0.2, Math.PI * 0.8);
+        ctx.stroke();
+
+        ctx.restore(); // End Head
+        ctx.restore(); // End Sloth
+    }
+
+    function drawForegroundLeaves() {
+        ctx.fillStyle = colors.leaves;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        
+        // Bottom Left Leaf
+        ctx.beginPath();
+        ctx.moveTo(0, height);
+        ctx.quadraticCurveTo(150, height - 100, 200, height);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(0, height);
+        ctx.quadraticCurveTo(50, height - 250, 0, height - 300);
+        ctx.fill();
+
+        // Top Right Leaf
+        ctx.beginPath();
+        ctx.moveTo(width, 0);
+        ctx.quadraticCurveTo(width - 200, 50, width, 150);
+        ctx.fill();
+        
+        ctx.shadowBlur = 0;
+    }
+
+    // Main animation loop
+    function animate() {
+        time += 0.01;
+        
+        ctx.clearRect(0, 0, width, height);
+        
+        drawBackground();
+        
+        // Background particles
+        particles.forEach(p => {
+            if(p.size < 1.5) {
+                p.update();
+                p.draw();
+            }
+        });
+
+        drawBranch();
+        drawSloth();
+        
+        // Foreground particles
+        particles.forEach(p => {
+            if(p.size >= 1.5) {
+                p.update();
+                p.draw();
+            }
+        });
+
+        drawForegroundLeaves();
+
+        requestAnimationFrame(animate);
+    }
+
+    // Initialization
+    window.addEventListener('resize', resize);
+    resize();
+    initParticles();
+    animate();
+
+</script>
+</body>
+</html>

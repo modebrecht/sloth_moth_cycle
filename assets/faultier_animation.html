@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entspanntes Faultier - Pacing & Rueh</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #051009;
+            font-family: sans-serif;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        #ui-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            pointer-events: none;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="jungleCanvas"></canvas>
+<div id="ui-overlay">Zustand: Wohlwollen & Milde (Upekkha)</div>
+
+<script>
+    const canvas = document.getElementById('jungleCanvas');
+    const ctx = canvas.getContext('2d', { alpha: false });
+
+    let w, h;
+    let centerX, centerY;
+
+    // --- STATE MACHINE ---
+    const STATES = {
+        IDLE: 0,
+        REACHING: 1,
+        PULLING: 2,
+        CHEWING: 3,
+        REACH_BRANCH: 4,
+        PULL_BRANCH: 5
+    };
+
+    let state = STATES.IDLE;
+    let stateTimer = 0;
+    let maxTime = 60; // frames
+    
+    // Sloth & Environment Config
+    let leafCount = 5;
+    let leaves = [];
+    let particles = [];
+    let fireflies = [];
+    
+    // Positions
+    let branchX, branchTargetX;
+    let oldBranchY = 0;
+    let oldBranchActive = false;
+    
+    let sloth = {
+        sx: 0, sy: 0, // Shoulder
+        mx: 0, my: 0, // Mouth
+        handX: 0, handY: 0, // Hand
+        restX: 0, restY: 0, // Resting Hand
+        isChewing: false,
+        eyesClosed: false
+    };
+
+    function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        centerX = w / 2;
+        centerY = h / 2;
+        
+        sloth.sx = centerX - 120;
+        sloth.sy = centerY - 30;
+        sloth.mx = centerX - 40;
+        sloth.my = centerY - 10;
+        sloth.restX = sloth.sx + 40;
+        sloth.restY = sloth.sy + 60;
+        
+        if (state === STATES.IDLE) {
+            sloth.handX = sloth.restX;
+            sloth.handY = sloth.restY;
+        }
+
+        branchTargetX = centerX + 120;
+        if(state !== STATES.PULL_BRANCH && state !== STATES.REACH_BRANCH) {
+            branchX = branchTargetX;
+        }
+    }
+
+    window.addEventListener('resize', resize);
+
+    // Easing function (smooth, deliberate movement)
+    function easeInOutQuad(t) { return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
+    function lerp(start, end, amt) { return (1 - amt) * start + amt * end; }
+
+    function initLeaves() {
+        leaves = [];
+        for(let i=0; i<5; i++) {
+            let stagger = (i % 2 === 0) ? -15 : 15;
+            let yPos = centerY - 60 + i * 45;
+            leaves.push({
+                idx: i,
+                baseXOffset: stagger,
+                baseY: yPos,
+                x: branchTargetX + stagger,
+                y: yPos,
+                scale: 1,
+                attached: true,
+                eaten: false,
+                angle: (i % 2 === 0 ? Math.PI : 0) + (Math.random()*0.2 - 0.1)
+            });
+        }
+        leafCount = 5;
+    }
+
+    function initFireflies() {
+        for(let i=0; i<40; i++) {
+            fireflies.push({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                s: Math.random() * 2 + 1,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                offset: Math.random() * 100
+            });
+        }
+    }
+
+    function spawnChewParticles() {
+        for(let i=0; i<3; i++) {
+            particles.push({
+                x: sloth.mx + (Math.random() * 20 - 10),
+                y: sloth.my + (Math.random() * 10 - 5),
+                vx: (Math.random() - 0.5) * 2,
+                vy: Math.random() * 2 + 1,
+                life: 1.0
+            });
+        }
+    }
+
+    // --- DRAWING FUNCTIONS ---
+
+    function drawBackground() {
+        // Deep Jungle Gradient
+        let grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, '#0a1a12');
+        grad.addColorStop(1, '#1a3a24');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Ambient Fireflies
+        ctx.fillStyle = 'rgba(150, 255, 100, 0.6)';
+        fireflies.forEach(f => {
+            f.x += f.vx;
+            f.y += f.vy + Math.sin(Date.now()*0.002 + f.offset)*0.2;
+            if(f.x < 0) f.x = w; if(f.x > w) f.x = 0;
+            if(f.y < 0) f.y = h; if(f.y > h) f.y = 0;
+            
+            ctx.beginPath();
+            ctx.arc(f.x, f.y, f.s * (Math.sin(Date.now()*0.005 + f.offset)*0.5 + 0.5), 0, Math.PI*2);
+            ctx.fill();
+        });
+    }
+
+    function drawMainBranch() {
+        ctx.fillStyle = '#3d2b1f'; // Dark Brown
+        ctx.beginPath();
+        // Top main horizontal branch
+        ctx.moveTo(0, centerY - 150);
+        ctx.quadraticCurveTo(w/2, centerY - 130, w, centerY - 160);
+        ctx.lineTo(w, centerY - 90);
+        ctx.quadraticCurveTo(w/2, centerY - 70, 0, centerY - 100);
+        ctx.fill();
+
+        // Subtly carve "Rueh" (Swiss for calmness) into the wood
+        ctx.save();
+        ctx.translate(centerX - 100, centerY - 105);
+        ctx.rotate(0.05);
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.font = 'italic 18px serif';
+        ctx.fillText('Rueh', 0, 0);
+        ctx.fillStyle = 'rgba(255,255,255,0.05)';
+        ctx.fillText('Rueh', 0, 1);
+        ctx.restore();
+    }
+
+    function drawLeaf(x, y, scale, angle, isChewed) {
+        if(scale <= 0) return;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.scale(scale, scale);
+        
+        ctx.fillStyle = '#4CAF50';
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.quadraticCurveTo(20, -20, 40, 0);
+        ctx.quadraticCurveTo(20, 20, 0, 0);
+        ctx.fill();
+        
+        // Vein
+        ctx.strokeStyle = '#2E7D32';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.quadraticCurveTo(20, 0, 35, 0);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    function drawFoodBranch(bx, offsetY = 0, opacity = 1.0) {
+        ctx.save();
+        ctx.globalAlpha = opacity;
+        ctx.fillStyle = '#4a3627';
+        ctx.beginPath();
+        ctx.moveTo(bx - 5, centerY - 100 + offsetY);
+        ctx.quadraticCurveTo(bx - 2, centerY + 100 + offsetY, bx - 1, centerY + 200 + offsetY);
+        ctx.lineTo(bx + 3, centerY + 200 + offsetY);
+        ctx.quadraticCurveTo(bx + 4, centerY + 100 + offsetY, bx + 5, centerY - 100 + offsetY);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawSloth() {
+        let scX = centerX - 120;
+        let scY = centerY;
+
+        // Legs connecting to top branch
+        ctx.strokeStyle = '#614631';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 22;
+        
+        // Back leg
+        ctx.beginPath(); ctx.moveTo(scX - 40, scY + 10); ctx.lineTo(scX - 60, scY - 110); ctx.stroke();
+        // Back arm
+        ctx.beginPath(); ctx.moveTo(scX + 20, scY + 10); ctx.lineTo(scX + 30, scY - 100); ctx.stroke();
+
+        // Body
+        ctx.fillStyle = '#7a573c';
+        ctx.beginPath();
+        ctx.ellipse(scX, scY + 20, 75, 55, -0.1, 0, Math.PI*2);
+        ctx.fill();
+        
+        // Belly (lighter)
+        ctx.fillStyle = '#8a6547';
+        ctx.beginPath();
+        ctx.ellipse(scX - 10, scY + 25, 45, 35, -0.1, 0, Math.PI*2);
+        ctx.fill();
+
+        // Front Leg
+        ctx.strokeStyle = '#7a573c';
+        ctx.beginPath(); ctx.moveTo(scX - 10, scY + 20); ctx.lineTo(scX - 30, scY - 100); ctx.stroke();
+
+        // Head
+        let headX = scX + 60;
+        let headY = scY - 10;
+        
+        ctx.fillStyle = '#7a573c';
+        ctx.beginPath();
+        ctx.ellipse(headX, headY, 40, 35, 0.2, 0, Math.PI*2);
+        ctx.fill();
+
+        // Face Mask (Light)
+        ctx.fillStyle = '#E5C4A0';
+        ctx.beginPath();
+        ctx.ellipse(headX + 5, headY + 2, 30, 26, 0.2, 0, Math.PI*2);
+        ctx.fill();
+
+        // Eye patches
+        ctx.fillStyle = '#4A3018';
+        ctx.beginPath(); ctx.ellipse(headX - 5, headY - 5, 12, 9, 0.5, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(headX + 18, headY - 2, 10, 8, -0.2, 0, Math.PI*2); ctx.fill();
+
+        // Eyes (Upekkha = relaxed, almost closed)
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        if (sloth.eyesClosed || state === STATES.CHEWING) {
+            // Blissfully eating / closed
+            ctx.beginPath(); ctx.arc(headX - 5, headY - 4, 6, 0.2, Math.PI-0.2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(headX + 18, headY - 1, 5, 0.2, Math.PI-0.2); ctx.stroke();
+        } else {
+            // Gently open
+            ctx.fillStyle = '#000';
+            ctx.beginPath(); ctx.arc(headX - 5, headY - 4, 3, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(headX + 18, headY - 1, 3, 0, Math.PI*2); ctx.fill();
+        }
+
+        // Nose
+        ctx.fillStyle = '#222';
+        ctx.beginPath(); ctx.ellipse(headX + 10, headY + 12, 6, 4, 0, 0, Math.PI*2); ctx.fill();
+
+        // Mouth (chewing animation)
+        ctx.strokeStyle = '#222';
+        ctx.beginPath();
+        if (sloth.isChewing) {
+            let chewAmount = Math.sin(Date.now() * 0.015);
+            if (chewAmount > 0) {
+                ctx.fillStyle = '#4a2511';
+                ctx.ellipse(headX + 10, headY + 22, 6, 2 + chewAmount * 4, 0, 0, Math.PI*2);
+                ctx.fill();
+            } else {
+                ctx.moveTo(headX + 4, headY + 20);
+                ctx.quadraticCurveTo(headX + 10, headY + 24, headX + 16, headY + 20);
+                ctx.stroke();
+            }
+        } else {
+            // Gentle smile
+            ctx.moveTo(headX + 4, headY + 20);
+            ctx.quadraticCurveTo(headX + 10, headY + 24, headX + 16, headY + 20);
+            ctx.stroke();
+        }
+
+        // Moving Arm (Front)
+        ctx.strokeStyle = '#7a573c';
+        ctx.lineWidth = 20;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        ctx.beginPath();
+        ctx.moveTo(sloth.sx, sloth.sy);
+        // Calculate elbow (hangs down naturally due to gravity)
+        let elbowX = (sloth.sx + sloth.handX) / 2;
+        let elbowY = Math.max(sloth.sy, sloth.handY) + 60; 
+        ctx.quadraticCurveTo(elbowX, elbowY, sloth.handX, sloth.handY);
+        ctx.stroke();
+
+        // Claws
+        ctx.strokeStyle = '#ccc';
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(sloth.handX, sloth.handY); ctx.lineTo(sloth.handX + 10, sloth.handY + 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(sloth.handX, sloth.handY); ctx.lineTo(sloth.handX + 5, sloth.handY + 15); ctx.stroke();
+    }
+
+    // --- MAIN LOOP ---
+
+    function update() {
+        let t = Math.min(stateTimer / maxTime, 1.0);
+        let easeT = easeInOutQuad(t);
+
+        switch (state) {
+            case STATES.IDLE:
+                // Very slow pacing
+                sloth.handX = sloth.restX;
+                sloth.handY = sloth.restY;
+                sloth.isChewing = false;
+                sloth.eyesClosed = (Math.random() < 0.02); // Occasional slow blink
+
+                if (stateTimer >= maxTime) {
+                    if (leafCount > 0) {
+                        state = STATES.REACHING;
+                        maxTime = 90; // Slow reach
+                    } else {
+                        state = STATES.REACH_BRANCH;
+                        maxTime = 100;
+                    }
+                    stateTimer = 0;
+                }
+                break;
+
+            case STATES.REACHING:
+                sloth.eyesClosed = false;
+                let targetLeaf = leaves[leafCount - 1];
+                sloth.handX = lerp(sloth.restX, targetLeaf.x, easeT);
+                sloth.handY = lerp(sloth.restY, targetLeaf.y, easeT);
+
+                if (t >= 1.0) {
+                    state = STATES.PULLING;
+                    stateTimer = 0;
+                    maxTime = 80;
+                    targetLeaf.attached = false;
+                }
+                break;
+
+            case STATES.PULLING:
+                let pulledLeaf = leaves[leafCount - 1];
+                sloth.handX = lerp(pulledLeaf.baseXOffset + branchX, sloth.mx, easeT);
+                sloth.handY = lerp(pulledLeaf.baseY, sloth.my, easeT);
+                
+                // Leaf follows hand
+                pulledLeaf.x = sloth.handX;
+                pulledLeaf.y = sloth.handY;
+
+                if (t >= 1.0) {
+                    state = STATES.CHEWING;
+                    stateTimer = 0;
+                    maxTime = 150; // Enjoy the food slowly
+                    sloth.isChewing = true;
+                }
+                break;
+
+            case STATES.CHEWING:
+                sloth.handX = lerp(sloth.mx, sloth.restX, easeT * 2 > 1 ? 1 : easeT * 2); // Hand drops quickly
+                sloth.handY = lerp(sloth.my, sloth.restY, easeT * 2 > 1 ? 1 : easeT * 2);
+                
+                let chewingLeaf = leaves[leafCount - 1];
+                chewingLeaf.scale = 1.0 - easeT; // Leaf disappears into mouth
+
+                if (Math.random() < 0.1 && chewingLeaf.scale > 0.1) spawnChewParticles();
+
+                if (t >= 1.0) {
+                    chewingLeaf.eaten = true;
+                    leafCount--;
+                    state = STATES.IDLE;
+                    stateTimer = 0;
+                    maxTime = 60; // Pause between leaves
+                }
+                break;
+
+            case STATES.REACH_BRANCH:
+                sloth.isChewing = false;
+                let offscreenBranchX = w + 100;
+                sloth.handX = lerp(sloth.restX, offscreenBranchX, easeT);
+                sloth.handY = lerp(sloth.restY, centerY, easeT);
+
+                if (t >= 1.0) {
+                    state = STATES.PULL_BRANCH;
+                    stateTimer = 0;
+                    maxTime = 120;
+                    
+                    // Trigger old branch to fall
+                    oldBranchActive = true;
+                    oldBranchY = 0;
+                    
+                    // Branch starts offscreen
+                    branchX = w + 100;
+                    initLeaves(); // Reset 5 leaves for the new branch
+                    leaves.forEach(l => {
+                        l.x = branchX + l.baseXOffset;
+                    });
+                }
+                break;
+
+            case STATES.PULL_BRANCH:
+                sloth.handX = lerp(w + 100, sloth.restX, easeT);
+                sloth.handY = lerp(centerY, sloth.restY, easeT);
+                
+                // Branch follows hand until it reaches its designated spot
+                branchX = sloth.handX;
+                if (branchX < branchTargetX) branchX = branchTargetX;
+
+                // Leaves follow the new branch in
+                leaves.forEach(l => {
+                    if (l.attached) l.x = branchX + l.baseXOffset;
+                });
+
+                if (oldBranchActive) oldBranchY += 5; // Old empty branch falls down
+
+                if (t >= 1.0) {
+                    state = STATES.IDLE;
+                    stateTimer = 0;
+                    maxTime = 60;
+                    oldBranchActive = false;
+                }
+                break;
+        }
+
+        // Update particles
+        for(let i = particles.length-1; i>=0; i--) {
+            let p = particles[i];
+            p.x += p.vx; p.y += p.vy;
+            p.life -= 0.02;
+            if(p.life <= 0) particles.splice(i, 1);
+        }
+
+        stateTimer++;
+    }
+
+    function draw() {
+        drawBackground();
+        drawMainBranch();
+        
+        // Draw Old falling branch
+        if (oldBranchActive) {
+            drawFoodBranch(branchTargetX, oldBranchY, Math.max(0, 1.0 - oldBranchY/h));
+        }
+
+        // Draw Active Branch
+        if (state !== STATES.REACH_BRANCH) {
+            drawFoodBranch(branchX, 0);
+            
+            // Draw Leaves
+            leaves.forEach(l => {
+                if (!l.eaten) {
+                    drawLeaf(l.x, l.y, l.scale, l.angle, false);
+                }
+            });
+        }
+
+        drawSloth();
+
+        // Draw Chew Particles
+        particles.forEach(p => {
+            ctx.fillStyle = `rgba(76, 175, 80, ${p.life})`;
+            ctx.fillRect(p.x, p.y, 4, 4);
+        });
+    }
+
+    function loop() {
+        update();
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    // Initialize
+    resize();
+    initFireflies();
+    initLeaves();
+    
+    // Start delay to let user settle
+    setTimeout(() => {
+        requestAnimationFrame(loop);
+    }, 500);
+
+</script>
+</body>
+</html>

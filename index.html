@@ -1789,6 +1789,18 @@
       .watch-prompts{grid-template-columns:1fr;gap:8px;}
     }
 
+    /* Toucan artwork and motion imported directly from assets/tucan.html */
+    .toucan-sprite.cover-toucan{display:none!important;}
+    .deck > .toucan-wrap{display:none;position:absolute;top:40px;right:40px;width:220px;z-index:30;pointer-events:none;animation:toucanFloat 4s ease-in-out infinite;}
+    .deck:has(.slide[data-title="Cover"].active) > .toucan-wrap{display:block;}
+    .deck > .toucan-wrap .toucan-svg{display:block;width:100%;height:auto;overflow:visible;}
+    .deck > .toucan-wrap .toucan-beak{transform-origin:230px 130px;animation:toucanBeakMove 5.5s ease-in-out infinite;}
+    @keyframes toucanFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-8px) rotate(1deg)}}
+    @keyframes toucanBeakMove{0%,100%{transform:rotate(0)}48%{transform:rotate(0)}52%{transform:rotate(2deg)}56%{transform:rotate(0)}}
+    @media(max-width:760px){
+      .deck > .toucan-wrap{top:64px;right:8px;width:150px;}
+    }
+
     /* Reusable animated jungle from assets/background.html */
     .jungle-background-layer{position:fixed;inset:0;z-index:0;width:100%;height:100%;border:0;pointer-events:none;opacity:.4;transition:opacity .25s ease;}
     body:not(.print-view) .app{position:relative;z-index:1;}
@@ -1896,6 +1908,39 @@
 </header>
 <div class="deck-wrap">
 <main class="deck" id="deck">
+<div aria-hidden="true" class="toucan-wrap">
+<svg class="toucan-svg" viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="toucanBody" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#202625"/><stop offset="55%" stop-color="#0f1313"/><stop offset="100%" stop-color="#050607"/></linearGradient>
+<linearGradient id="toucanWing" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#3a4645"/><stop offset="100%" stop-color="#151918"/></linearGradient>
+<linearGradient id="toucanBeakTop" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="#8de96b"/><stop offset="28%" stop-color="#d8ef56"/><stop offset="55%" stop-color="#ffd44c"/><stop offset="80%" stop-color="#ff9a33"/><stop offset="100%" stop-color="#ff5c2b"/></linearGradient>
+<linearGradient id="toucanBeakBottom" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="#f7d548"/><stop offset="55%" stop-color="#ffab36"/><stop offset="100%" stop-color="#ff6c2f"/></linearGradient>
+<filter height="160%" id="toucanSoftShadow" width="160%" x="-30%" y="-30%"><feDropShadow dx="0" dy="8" flood-color="#000000" flood-opacity="0.18" stdDeviation="8"/></filter>
+</defs>
+<g filter="url(#toucanSoftShadow)">
+<path d="M40 262 C120 250, 215 255, 372 245" fill="none" stroke="#7a5030" stroke-linecap="round" stroke-width="16"/>
+<path d="M120 257 C111 272, 95 284, 76 291" fill="none" stroke="#5d3a22" stroke-linecap="round" stroke-width="8"/>
+<path d="M266 250 C279 265, 296 276, 318 284" fill="none" stroke="#5d3a22" stroke-linecap="round" stroke-width="8"/>
+</g>
+<path d="M124 164 C97 175, 86 204, 103 226 C122 218, 142 200, 149 177 Z" fill="#080909"/>
+<ellipse cx="185" cy="176" fill="url(#toucanBody)" rx="74" ry="68"/>
+<path d="M168 132 C147 140, 136 159, 137 183 C138 210, 157 230, 185 232 C202 220, 213 198, 213 172 C213 149, 198 134, 168 132 Z" fill="#f6f4ec"/>
+<path d="M161 168 C171 147, 195 139, 217 148 C221 171, 209 196, 183 209 C163 205, 151 190, 152 176 C153 173, 156 170, 161 168 Z" fill="url(#toucanWing)"/>
+<circle cx="212" cy="124" fill="url(#toucanBody)" r="46"/>
+<path d="M192 147 C191 132, 202 120, 220 117 C227 130, 226 146, 217 156 C206 156, 197 153, 192 147 Z" fill="#f6f4ec"/>
+<circle cx="220" cy="116" fill="#7fd3ff" r="13"/><circle cx="220" cy="116" fill="#ffffff" r="9"/><circle cx="222" cy="116" fill="#111111" r="5"/><circle cx="224" cy="114" fill="#ffffff" r="1.8"/>
+<g class="toucan-beak">
+<path d="M232 106 C256 83, 303 70, 358 77 C383 80, 396 89, 397 102 C395 118, 372 129, 334 136 C292 143, 256 140, 228 130 C224 121, 225 112, 232 106 Z" fill="url(#toucanBeakTop)" stroke="#c26c24" stroke-linejoin="round" stroke-width="3"/>
+<path d="M230 131 C269 140, 324 141, 383 124 C376 147, 349 160, 307 163 C271 166, 241 160, 224 147 C222 141, 224 135, 230 131 Z" fill="url(#toucanBeakBottom)" stroke="#cf7328" stroke-linejoin="round" stroke-width="2.5"/>
+<path d="M233 130 C275 136, 328 134, 385 122" fill="none" opacity="0.9" stroke="#d97f2d" stroke-linecap="round" stroke-width="2.5"/>
+<ellipse cx="255" cy="99" fill="#2f3a32" opacity="0.45" rx="5.5" ry="3.5"/>
+<path d="M247 96 C281 82, 336 82, 375 94" fill="none" opacity="0.65" stroke="#fff2aa" stroke-linecap="round" stroke-width="4"/>
+</g>
+<path d="M170 235 L165 258" stroke="#3f2b1f" stroke-linecap="round" stroke-width="5"/><path d="M198 236 L203 258" stroke="#3f2b1f" stroke-linecap="round" stroke-width="5"/>
+<path d="M165 258 C155 253, 147 253, 138 259" fill="none" stroke="#3f2b1f" stroke-linecap="round" stroke-width="5"/><path d="M165 258 C173 253, 180 253, 188 259" fill="none" stroke="#3f2b1f" stroke-linecap="round" stroke-width="5"/>
+<path d="M203 258 C193 253, 185 253, 176 259" fill="none" stroke="#3f2b1f" stroke-linecap="round" stroke-width="5"/><path d="M203 258 C211 253, 218 253, 226 259" fill="none" stroke="#3f2b1f" stroke-linecap="round" stroke-width="5"/>
+</svg>
+</div>
 <section class="slide active" data-title="Cover"><div aria-hidden="true" class="veg-frame"><span class="veg-sprite veg-broad cover-left"><svg aria-hidden="true" viewBox="0 0 108 164" xmlns="http://www.w3.org/2000/svg"><path d="M53 160c0-45 2-86 8-142" fill="none" stroke="#7a5a38" stroke-linecap="round" stroke-width="4"></path><path d="M52 58C28 60 14 77 14 100c23 4 38-9 44-33 1-5-2-10-6-9Z" fill="#79cc80" stroke="#41914c" stroke-width="2.4"></path><path d="M63 74c22-6 34-20 34-46-22 2-36 15-41 39-1 4 2 9 7 7Z" fill="#a1df72" stroke="#52984a" stroke-width="2.4"></path><path d="M52 114c-20-1-32 8-39 24 19 8 34 4 45-15" fill="#6cc88a" stroke="#3c9359" stroke-width="2.4"></path><path d="M68 124c16 0 27 9 34 23-17 7-30 4-39-13" fill="#8ed77a" stroke="#4d994d" stroke-width="2.4"></path></svg></span><span class="veg-sprite veg-palm cover-right"><svg aria-hidden="true" viewBox="0 0 122 168" xmlns="http://www.w3.org/2000/svg"><path d="M63 164c-2-44 1-82 10-136" fill="none" stroke="#8a673f" stroke-linecap="round" stroke-width="4"></path><path d="M64 38c-26 4-42 18-47 42 24 2 43-9 54-31" fill="#7fd179" stroke="#4a964c" stroke-width="2.4"></path><path d="M71 54c26-3 42-16 47-39-26-1-43 10-53 32" fill="#a9e472" stroke="#589c4a" stroke-width="2.4"></path><path d="M58 80c-24 3-38 15-43 36 23 2 38-8 48-28" fill="#6fc98b" stroke="#3e945c" stroke-width="2.4"></path><path d="M76 92c22-2 37 9 43 30-20 4-35-4-46-24" fill="#8ed77a" stroke="#51994c" stroke-width="2.4"></path></svg></span><span class="veg-sprite veg-vine cover-vine"><svg aria-hidden="true" viewBox="0 0 82 150" xmlns="http://www.w3.org/2000/svg"><path d="M42 0c4 24 1 47-4 68-4 18-11 40-26 78" fill="none" stroke="#7a5a38" stroke-linecap="round" stroke-width="3.4"></path><path d="M40 22c-10 2-16 9-20 20 10 4 19 1 24-11" fill="#91d679" stroke="#4e9a4e" stroke-width="2.2"></path><path d="M32 56c-12 2-18 9-22 20 12 5 20 1 26-11" fill="#74cb8a" stroke="#3e945c" stroke-width="2.2"></path><path d="M24 92c-9 2-14 7-17 16 10 4 17 2 21-7" fill="#a4e37f" stroke="#529d4a" stroke-width="2.2"></path><path d="M48 26c10 3 16 10 19 18-10 4-17 1-22-10" fill="#a9eb7b" stroke="#529d49" stroke-width="2.2"></path></svg></span><span class="toucan-sprite toucan-fly cover-toucan"><svg aria-hidden="true" viewBox="0 0 118 96" xmlns="http://www.w3.org/2000/svg"><path d="M62 67c-17 0-31-13-31-28s14-27 31-27c8 0 15 2 21 7 5 5 9 12 9 20 0 15-14 28-30 28Z" fill="#1f2a24" stroke="#0f1613" stroke-width="2.4"></path><path class="wing" d="M58 34c-10 3-16 10-18 20 10 2 19-1 26-9-1-5-4-9-8-11Z" fill="#3b5245" stroke="#1f2a24" stroke-width="2"></path><path d="M49 72c6 7 14 12 24 13" fill="none" stroke="#3d2c22" stroke-linecap="round" stroke-width="4"></path><circle cx="73" cy="35" fill="#f5f5f0" r="10" stroke="#1f2a24" stroke-width="2"></circle><circle cx="76" cy="35" fill="#1f2a24" r="3.3"></circle><path class="head" d="M83 31c15-11 28-12 33-5-2 9-14 17-31 17" fill="#f6c64a" stroke="#b27617" stroke-linejoin="round" stroke-width="2.4"></path><path d="M84 39c11 5 22 5 28 0-4 8-14 13-28 10" fill="#ff8d2c" stroke="#c76313" stroke-linejoin="round" stroke-width="2.2"></path><path d="M38 75h40" fill="none" stroke="#7a5a38" stroke-linecap="round" stroke-width="5"></path></svg></span><span class="veg-sprite jungle-side jungle-side-left"><svg aria-hidden="true" viewBox="0 0 150 360" xmlns="http://www.w3.org/2000/svg">
 <path d="M60 350c2-80 4-166 20-322" fill="none" stroke="#785739" stroke-linecap="round" stroke-width="5"></path>
 <path d="M51 80C22 84 6 105 5 135c31 4 50-13 57-44 1-6-5-12-11-11Z" fill="#7dcc83" stroke="#3e8f4b" stroke-width="3"></path>
