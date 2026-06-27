@@ -1770,17 +1770,21 @@
 
     /* Video bridge between vocabulary and reading */
     .video-cycle-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(240px,.65fr);gap:20px;align-items:stretch;margin-top:20px;}
-    .video-card,.cycle-card{padding:14px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,#fff,#f5fff5);box-shadow:var(--soft-shadow);}
+    .video-card,.sloth-card{padding:14px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,#fff,#f5fff5);box-shadow:var(--soft-shadow);}
     .video-frame{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:17px;background:#10291f;}
     .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+    .video-launch{position:absolute;inset:0;display:grid;place-content:center;gap:12px;padding:24px;text-align:center;color:white;background:radial-gradient(circle at 50% 35%,rgba(111,207,125,.28),transparent 38%),linear-gradient(145deg,#173d2e,#10291f);text-decoration:none;}
+    .video-launch:hover{color:white;filter:brightness(1.08);}
+    .video-launch-icon{display:grid;place-items:center;width:68px;height:68px;margin:auto;border-radius:50%;background:#ffcc66;color:#33210d;font-size:1.8rem;box-shadow:0 14px 34px rgba(0,0,0,.24);}
+    .video-launch small{color:#d9ffdf;font-weight:700;}
     .video-fallback{margin:10px 2px 0;font-size:.86rem;color:var(--muted);}
-    .cycle-card{display:flex;flex-direction:column;gap:10px;margin:0;}
-    .cycle-card img{width:100%;min-height:0;flex:1;object-fit:contain;border-radius:17px;background:#edf7ea;}
+    .sloth-card{display:flex;flex-direction:column;gap:10px;margin:0;}
+    .sloth-embed{width:100%;min-height:300px;flex:1;border:0;border-radius:17px;background:#edf7ea;}
     .watch-prompts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px;}
     .watch-prompts .info-card{padding:14px 16px;}
     @media(max-width:760px){
       .video-cycle-grid{grid-template-columns:1fr;gap:14px;}
-      .cycle-card img{max-height:55vh;}
+      .sloth-embed{min-height:280px;max-height:55vh;}
       .watch-prompts{grid-template-columns:1fr;gap:8px;}
     }
 
@@ -2051,17 +2055,32 @@
 <section class="slide" data-title="Watch: the cycle">
 <span class="slide-kicker">🎬 Slide 4 · Watch &amp; notice</span>
 <h2>See the sloth–moth cycle in action</h2>
-<p class="lead">Watch how a sloth lives and listen for the roles of moths and algae. Use the diagram to follow the cycle.</p>
+<p class="lead">Watch how a sloth lives and listen for the roles of moths and algae. Focus on what each organism does.</p>
 <div class="video-cycle-grid">
 <div class="video-card">
-<div class="video-frame">
-<iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube-nocookie.com/embed/DyPMacfE0n4" title="The sloth, moth and algae life cycle"></iframe>
+<div class="video-frame" id="cycleVideo">
+<a class="video-launch" href="https://www.youtube.com/watch?v=DyPMacfE0n4" rel="noopener noreferrer" target="_blank"><span class="video-launch-icon">▶</span><strong>Watch the video on YouTube</strong><small>Opens in a new tab</small></a>
 </div>
 <p class="video-fallback">Video unavailable? <a href="https://www.youtube.com/watch?v=DyPMacfE0n4" rel="noopener noreferrer" target="_blank">Open it directly on YouTube ↗</a></p>
+<script>
+  (() => {
+    if(!/^https?:$/.test(location.protocol)) return;
+    const frame = document.getElementById('cycleVideo');
+    if(!frame) return;
+    const video = document.createElement('iframe');
+    video.src = 'https://www.youtube-nocookie.com/embed/DyPMacfE0n4';
+    video.title = 'The sloth, moth and algae life cycle';
+    video.loading = 'lazy';
+    video.referrerPolicy = 'strict-origin-when-cross-origin';
+    video.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    video.allowFullscreen = true;
+    frame.replaceChildren(video);
+  })();
+</script>
 </div>
-<figure class="cycle-card">
-<img alt="Diagram showing the life cycle connecting sloths, moths and algae" loading="lazy" src="assets/slothmoth-cycle.png"/>
-<figcaption><strong>Follow the cycle:</strong> point to each stage when you hear it.</figcaption>
+<figure class="sloth-card">
+<iframe class="sloth-embed" loading="lazy" src="assets/hang.html" title="Animated sloth hanging from a branch"></iframe>
+<figcaption><strong>Watch closely:</strong> where does a sloth spend most of its time?</figcaption>
 </figure>
 </div>
 <div class="watch-prompts">
