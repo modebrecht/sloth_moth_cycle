@@ -1767,6 +1767,66 @@
     }
     .slide[data-title="Listening"] .gap-quiz,
     .slide[data-title="Listening"] .order-section{position:relative;z-index:3;}
+
+    /* Stable application shell: controls occupy their own rows instead of
+       covering the slide. Keep this final so legacy tuning above cannot
+       reintroduce the fixed overlay layout. */
+    body:not(.print-view) .app{
+      display:grid!important;
+      grid-template-rows:auto minmax(0,1fr) auto!important;
+      gap:10px!important;
+      height:100dvh!important;
+      padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))!important;
+      overflow:hidden!important;
+    }
+    body:not(.print-view) .top,
+    body:not(.print-view) .bottom{
+      position:relative!important;
+      inset:auto!important;
+      width:100%!important;
+      padding:0!important;
+      pointer-events:auto!important;
+    }
+    body:not(.print-view) .top-inner,
+    body:not(.print-view) .bottom-inner{
+      width:min(1220px,100%)!important;
+      max-width:100%!important;
+      margin:0 auto!important;
+    }
+    body:not(.print-view) .deck-wrap{
+      width:100%!important;
+      height:auto!important;
+      min-height:0!important;
+      padding:0!important;
+      overflow:hidden!important;
+    }
+    body:not(.print-view) .deck{
+      width:min(1220px,100%)!important;
+      height:100%!important;
+      min-height:0!important;
+      margin:0 auto!important;
+    }
+    body:not(.print-view) .slide{
+      height:100%!important;
+      min-height:0!important;
+      margin:0!important;
+      padding:clamp(22px,3vw,42px)!important;
+      scroll-padding:24px!important;
+    }
+
+    @media(max-width:920px){
+      body:not(.print-view) .app{
+        gap:6px!important;
+        padding:max(6px,env(safe-area-inset-top)) max(6px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left))!important;
+      }
+      body:not(.print-view) .top-inner{
+        grid-template-columns:minmax(0,1fr)!important;
+      }
+      body:not(.print-view) .slide{
+        padding:20px 14px!important;
+        border-radius:20px!important;
+      }
+    }
 </style>
 </head>
 <body>
