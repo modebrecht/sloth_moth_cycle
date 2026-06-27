@@ -1795,7 +1795,9 @@
     body:not(.print-view) .slide{background:rgba(255,253,247,var(--slide-surface-opacity,.75))!important;}
     .visual-options{position:fixed;right:max(12px,calc((100vw - 1220px)/2 + 12px));bottom:64px;z-index:160;width:min(290px,calc(100vw - 24px));padding:16px;border-radius:18px;background:rgba(18,50,38,.94);border:1px solid rgba(255,255,255,.28);box-shadow:0 18px 44px rgba(0,0,0,.28);backdrop-filter:blur(20px);color:white;}
     .visual-options[hidden]{display:none!important;}
-    .visual-options strong{display:block;margin-bottom:12px;}
+    .visual-options-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+    .visual-options-header strong{display:block;}
+    .visual-options-reset{min-height:0!important;padding:5px 9px!important;font-size:.72rem!important;background:rgba(255,255,255,.14)!important;color:white!important;border:1px solid rgba(255,255,255,.25)!important;box-shadow:none!important;}
     .visual-option-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:10px;font-weight:750;}
     .visual-option-row input[type="range"]{flex:1;min-width:90px;accent-color:#ffcc66;}
     .visual-option-row input[type="checkbox"]{width:19px;height:19px;accent-color:#6fcf7d;}
@@ -2440,10 +2442,11 @@
 <div class="footer-note">← → · swipe · double tap images 💚</div>
 </div>
 <div class="visual-options" hidden id="visualOptions">
-<strong>Visual options</strong>
+<div class="visual-options-header"><strong>Visual options</strong><button class="visual-options-reset" id="resetVisualOptions" type="button">Reset defaults</button></div>
 <label class="visual-option-row"><span>Moving jungle</span><input checked id="backgroundEnabled" type="checkbox"/></label>
 <label class="visual-option-row"><span>Background</span><input id="backgroundOpacity" max="100" min="0" step="5" type="range" value="40"/><output id="backgroundOpacityValue">40%</output></label>
 <label class="visual-option-row"><span>White slides</span><input id="slideOpacity" max="100" min="0" step="5" type="range" value="75"/><output id="slideOpacityValue">75%</output></label>
+<label class="visual-option-row"><span>Text size</span><input id="contentFontScale" max="250" min="80" step="5" type="range" value="100"/><output id="contentFontScaleValue">100%</output></label>
 </div>
 </footer>
 </div>
@@ -3266,8 +3269,25 @@
   const opacityValue = document.getElementById('backgroundOpacityValue');
   const slideOpacityInput = document.getElementById('slideOpacity');
   const slideOpacityValue = document.getElementById('slideOpacityValue');
+  const fontScaleInput = document.getElementById('contentFontScale');
+  const fontScaleValue = document.getElementById('contentFontScaleValue');
+  const resetButton = document.getElementById('resetVisualOptions');
 
-  let settings = { enabled: true, opacity: 40, slideOpacity: 75 };
+  const scalableText = Array.from(document.querySelectorAll('.slide *')).filter(element => {
+    if(element.closest('h1,h2,h3,.word,.slide-kicker,svg,.veg-frame,.ambient,.ambient-life,.icon-svg,.tiny-svg')) return false;
+    if(element.matches('script,style,img,svg,path,iframe,canvas,video')) return false;
+    const isControl = element.matches('button,input,select,textarea');
+    const hasDirectText = Array.from(element.childNodes).some(node =>
+      node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+    );
+    return isControl || hasDirectText;
+  });
+
+  scalableText.forEach(element => {
+    element.dataset.baseFontSize = String(parseFloat(getComputedStyle(element).fontSize));
+  });
+
+  let settings = { enabled: true, opacity: 40, slideOpacity: 75, fontScale: 100 };
   try {
     settings = { ...settings, ...JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') };
   } catch(e) {}
@@ -3275,8 +3295,10 @@
   function applyVisualSettings(){
     const rawOpacity = Number(settings.opacity);
     const rawSlideOpacity = Number(settings.slideOpacity);
+    const rawFontScale = Number(settings.fontScale);
     const opacity = Math.max(0, Math.min(100, Number.isFinite(rawOpacity) ? rawOpacity : 40));
     const slideOpacity = Math.max(0, Math.min(100, Number.isFinite(rawSlideOpacity) ? rawSlideOpacity : 75));
+    const fontScale = Math.max(80, Math.min(250, Number.isFinite(rawFontScale) ? rawFontScale : 100));
     background.hidden = !settings.enabled;
     background.style.opacity = String(opacity / 100);
     document.documentElement.style.setProperty('--slide-surface-opacity', String(slideOpacity / 100));
@@ -3286,7 +3308,13 @@
     opacityValue.value = `${opacity}%`;
     slideOpacityInput.value = String(slideOpacity);
     slideOpacityValue.value = `${slideOpacity}%`;
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled: settings.enabled, opacity, slideOpacity })); } catch(e) {}
+    fontScaleInput.value = String(fontScale);
+    fontScaleValue.value = `${fontScale}%`;
+    scalableText.forEach(element => {
+      const base = Number(element.dataset.baseFontSize);
+      if(Number.isFinite(base)) element.style.setProperty('font-size', `${base * fontScale / 100}px`, 'important');
+    });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled: settings.enabled, opacity, slideOpacity, fontScale })); } catch(e) {}
   }
 
   window.toggleVisualOptions = function(){
@@ -3305,6 +3333,14 @@
   });
   slideOpacityInput.addEventListener('input', () => {
     settings.slideOpacity = Number(slideOpacityInput.value);
+    applyVisualSettings();
+  });
+  fontScaleInput.addEventListener('input', () => {
+    settings.fontScale = Number(fontScaleInput.value);
+    applyVisualSettings();
+  });
+  resetButton.addEventListener('click', () => {
+    settings = { enabled: true, opacity: 40, slideOpacity: 75, fontScale: 100 };
     applyVisualSettings();
   });
   document.addEventListener('click', event => {
