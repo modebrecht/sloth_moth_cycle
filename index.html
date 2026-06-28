@@ -1493,6 +1493,7 @@
     .slide[data-title="Reading check"] .lead,
     .slide[data-title="Research"] h2,
     .slide[data-title="Research"] .lead,
+    .slide[data-title="Research"] .slide-image-row,
     .slide[data-title="Research"] .source-grid,
     .slide[data-title="Research"] .taskline,
     .slide[data-title="Research"] .question,
@@ -1521,6 +1522,7 @@
     .slide[data-title="Final task"] h2,
     .slide[data-title="Final task"] .scene-gallery,
     .slide[data-title="Final task"] .final-box,
+    .slide[data-title="Final task"] .selfcheck-section,
     .slide[data-title="Final task"] h3,
     .slide[data-title="Final task"] .grid-2,
     .slide[data-title="Final task"] .pillbox,
@@ -1542,13 +1544,61 @@
     }
     .slide[data-title="Final task"] .scene-gallery .scene-panel{overflow:hidden;}
     .slide[data-title="Final task"] .selfcheck-section{margin-top:16px;}
-    .slide[data-title="Final task"] .compact-selfcheck{gap:10px;}
-    .slide[data-title="Final task"] .final-export-buttons{gap:12px;flex-wrap:wrap;display:flex;justify-content:flex-start;}
-    .slide[data-title="Final task"] .final-export-buttons button{min-width:180px;}
-
-    /* Congratulations slide styling */
-    .slide[data-title="Congratulations"] .scene-gallery{justify-content:center;max-width:880px;margin-left:auto;margin-right:auto}
-    .slide[data-title="Congratulations"] .scene-panel img{border-radius:20px;box-shadow:0 20px 40px rgba(8,28,20,.12);width:50vw;max-width:880px;height:auto;display:block;margin-left:auto;margin-right:auto}
+    .slide[data-title="Final task"] .selfcheck-section h3{
+      margin:0 0 12px;
+      color:#10291f;
+      font-size:clamp(1.45rem,2.2vw,2rem);
+      font-weight:1000;
+      text-shadow:0 2px 0 rgba(255,255,255,.7);
+    }
+    .slide[data-title="Final task"] .selfcheck-list{
+      display:grid;
+      gap:10px;
+      margin:0;
+      padding:0;
+      list-style:none;
+      counter-reset:selfcheck;
+    }
+    .slide[data-title="Final task"] .selfcheck-list li{
+      counter-increment:selfcheck;
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr);
+      gap:10px;
+      align-items:start;
+    }
+    .slide[data-title="Final task"] .selfcheck-list li::before{
+      content:counter(selfcheck) ".";
+      min-width:2rem;
+      padding-top:14px;
+      color:#10291f;
+      font-size:1.08rem;
+      font-weight:1000;
+      text-align:right;
+    }
+    .slide[data-title="Final task"] .selfcheck-list .info-card{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      width:100%;
+      margin:0;
+      line-height:1.35;
+    }
+    /* Congratulations slide uses the same stable image-card pattern as the activity galleries. */
+    .slide[data-title="Congratulations"] .slide-image-row{
+      max-width:880px;
+      margin:18px 0 0;
+    }
+    .slide[data-title="Congratulations"] .slide-image-card{
+      max-width:calc((100% - 18px) / 2);
+    }
+    .slide[data-title="Congratulations"] .slide-image-card img{
+      height:clamp(220px,26vw,350px);
+    }
+    @media(max-width:760px){
+      .slide[data-title="Congratulations"] .slide-image-card{
+        max-width:none;
+      }
+    }
 
     .slide[data-title="Final task"] .scene-gallery{
       position:relative;
@@ -1799,7 +1849,6 @@
       filter:saturate(.55);
       box-shadow:none;
     }
-    #finalExportStatus.export-ready{color:#16653b;font-weight:900;}
     @media(max-width:760px){
       .slide-image-row.two-images{grid-template-columns:1fr;}
       .slide-image-card img,
@@ -2547,6 +2596,14 @@
 <div class="slide-kicker">🌐 Slide 9 · Internet research</div>
 <h2>Research mission</h2>
 <p class="lead">Find two extra facts that are not copied from the reading text. Use reliable sources. Write in your own words.</p>
+<div class="slide-image-row two-images">
+<figure class="slide-image-card">
+<img alt="Researcher sloth with a magnifying glass in the field" src="assets/researcher_sloth_field_magnifying_glass.webp" loading="lazy">
+</figure>
+<figure class="slide-image-card">
+<img alt="Researcher sloth in a lab with a green flask" src="assets/researcher_sloth_lab_green_flask_storybook.webp" loading="lazy">
+</figure>
+</div>
 <div class="source-grid">
 <div class="source-card"><strong>Source 1</strong><br/><a href="https://royalsociety.org/news/2014/sloths-moths-mutualisms/" rel="noopener" target="_blank">Royal Society: The sloth and the moth</a><small>Good for the scientific relationship.</small></div>
 <div class="source-card"><strong>Source 2</strong><br/><a href="https://www.slothconservation.org/blog/with-a-little-help-from-my-friends-sloths-moths-and-algae" rel="noopener" target="_blank">Sloth Conservation Foundation</a><small>Good for fur, moths and camouflage.</small></div>
@@ -2601,18 +2658,13 @@
 </div>
 <div class="selfcheck-section">
 <h3>Self-check</h3>
-<div class="grid-2 compact-selfcheck">
-<label class="info-card"><input class="selfcheck" type="checkbox"/> I used at least five key vocabulary words.</label>
-<label class="info-card"><input class="selfcheck" type="checkbox"/> I explained benefits for at least two species.</label>
-<label class="info-card"><input class="selfcheck" type="checkbox"/> I used careful language like “may”, “can”, “scientists think” or “evidence suggests”.</label>
-<label class="info-card"><input class="selfcheck" type="checkbox"/> I wrote two extra research facts in my own words.</label>
+<ol class="selfcheck-list">
+<li><label class="info-card"><input class="selfcheck" type="checkbox"/> I used at least five key vocabulary words.</label></li>
+<li><label class="info-card"><input class="selfcheck" type="checkbox"/> I explained benefits for at least two species.</label></li>
+<li><label class="info-card"><input class="selfcheck" type="checkbox"/> I used careful language like “may”, “can”, “scientists think” or “evidence suggests”.</label></li>
+<li><label class="info-card"><input class="selfcheck" type="checkbox"/> I wrote two extra research facts in my own words.</label></li>
+</ol>
 </div>
-</div>
-<div class="pillbox final-export-buttons">
-<button class="secondary export-locked" data-final-export id="finalPdfBtn" onclick="requestPDF()" disabled>PDF herunterladen</button>
-<button class="plain export-locked" data-final-export id="finalJsonBtn" onclick="downloadWorksheetJSON()" disabled>JSON herunterladen</button>
-</div>
-<p class="micro-help" id="finalExportStatus">PDF and JSON unlock at 100 XP, with 120+ words and all four self-checks complete.</p>
 <pre class="copybox" id="copyBox"></pre>
 </section>
 
@@ -2620,10 +2672,13 @@
 <section class="slide" data-title="Congratulations">
   <div class="slide-kicker">🎉 Final slide</div>
   <h2>You have completed the journey as a sloth researcher</h2>
-    <div class="scene-gallery congratulations" style="margin-top:18px;">
-    <div class="scene-panel">
+  <div class="slide-image-row two-images">
+    <figure class="slide-image-card">
       <img alt="Sloth family" src="assets/family_from_index_old_7.webp" />
-    </div>
+    </figure>
+    <figure class="slide-image-card">
+      <img alt="Sloth celebration in the jungle" src="assets/sloth_subtle_party.webp" />
+    </figure>
   </div>
   <div class="pillbox" style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
     <button class="secondary" id="finalPdfBtn2" onclick="requestPDF()">PDF herunterladen</button>
@@ -3033,39 +3088,7 @@
       const count = wordCount($('#finalText').value);
       $('#wordCount').textContent = count;
       setFinalGlow(count);
-      checkFinalBossStatus();
     });
-    $$('.selfcheck').forEach(checkbox => {
-      checkbox.addEventListener('change', checkFinalBossStatus);
-    });
-    function checkFinalBossStatus(){
-      const finalText = $('#finalText');
-      const wordCount$ = wordCount(finalText.value);
-      const allChecks = $$('.selfcheck').every(c => c.checked);
-      const hasMinWords = wordCount$ >= 120;
-      const canExport = xp >= 100 && hasMinWords && allChecks;
-      
-      const pdfBtn = $('#finalPdfBtn');
-      const jsonBtn = $('#jsonDownloadBtn');
-      const statusEl = $('#finalExportStatus');
-      
-      if(pdfBtn) pdfBtn.disabled = !canExport;
-      if(jsonBtn) jsonBtn.disabled = !canExport;
-      
-      if(statusEl){
-        if(canExport){
-          statusEl.classList.add('export-ready');
-          statusEl.innerHTML = '<strong>✅ Export ready!</strong> You can now download PDF & JSON';
-        }else{
-          statusEl.classList.remove('export-ready');
-          const missing = [];
-          if(xp < 100) missing.push(`${100-xp} more XP`);
-          if(!hasMinWords) missing.push(`${120-wordCount$} more words`);
-          if(!allChecks) missing.push('complete all 4 self-checks');
-          statusEl.innerHTML = `PDF and JSON unlock: ${missing.join(' · ')}`;
-        }
-      }
-    }
     
     function makeWorksheetJSON(){
       return {
