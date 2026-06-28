@@ -2169,7 +2169,7 @@
       }
     }
 
-    .scene-panel, .slide-image-card {
+    .scene-panel, .slide-image-card, .taskline, summary {
       position: relative !important;
       overflow: hidden !important;
     }
@@ -4164,13 +4164,32 @@
     }
 
     function setupImageXP(){
-      const imageContainers = document.querySelectorAll('.scene-panel, .slide-image-card');
+      const imageContainers = document.querySelectorAll('.scene-panel, .slide-image-card, .taskline, summary');
       const claimedImages = JSON.parse(localStorage.getItem('slothMothClaimedImageXP') || '[]');
       
       imageContainers.forEach((container, index) => {
         container.querySelectorAll('.xp-click-badge').forEach(b => b.remove());
         
-        if (claimedImages.includes(index)) {
+        function getContainerKey(el, idx) {
+          if (el.id) return el.id;
+          if (el.classList.contains('taskline')) {
+            const num = el.querySelector('.num')?.textContent;
+            return `goal-${num || idx}`;
+          }
+          if (el.tagName.toLowerCase() === 'summary') {
+            return 'goal-summary';
+          }
+          const img = el.querySelector('img');
+          if (img && img.getAttribute('src')) {
+            const src = img.getAttribute('src');
+            return `img-${src.split('/').pop().split('.')[0]}`;
+          }
+          return `img-idx-${idx}`;
+        }
+        
+        const key = getContainerKey(container, index);
+        
+        if (claimedImages.includes(key)) {
           return;
         }
         
@@ -4181,15 +4200,15 @@
         
         const handleClick = (e) => {
           const currentClaimed = JSON.parse(localStorage.getItem('slothMothClaimedImageXP') || '[]');
-          if (currentClaimed.includes(index)) return;
+          if (currentClaimed.includes(key)) return;
           
-          currentClaimed.push(index);
+          currentClaimed.push(key);
           localStorage.setItem('slothMothClaimedImageXP', JSON.stringify(currentClaimed));
           
           badge.classList.add('claimed');
           setTimeout(() => badge.remove(), 400);
           
-          awardXP(2, 'Investigated Image 📸', e.clientX || window.innerWidth/2, e.clientY || window.innerHeight/2);
+          awardXP(2, 'Explored! 🔬', e.clientX || window.innerWidth/2, e.clientY || window.innerHeight/2);
           playSoftTone('success');
           
           const saveFunc = typeof scheduleSave === 'function' ? scheduleSave : window.scheduleSave;
@@ -4400,9 +4419,9 @@
     setupImageXP();
 
     // Temporary helper: reset claimed images once so the user can verify the new ribbon styles!
-    if (!localStorage.getItem('slothMothRibbonReset_v3')) {
+    if (!localStorage.getItem('slothMothRibbonReset_v4')) {
       localStorage.setItem('slothMothClaimedImageXP', '[]');
-      localStorage.setItem('slothMothRibbonReset_v3', 'true');
+      localStorage.setItem('slothMothRibbonReset_v4', 'true');
     }
   </script>
 <script>
