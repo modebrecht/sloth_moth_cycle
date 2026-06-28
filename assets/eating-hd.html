@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realistic Sloth Animation - Mobile Optimized</title>
+    <style>
+        :root {
+            --jungle-dark: #0a1c11;
+            --jungle-light: #163d27;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--jungle-dark);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        svg {
+            width: 100vw;
+            height: 100vh;
+            max-width: 1200px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        /* Ambient Animations */
+        @keyframes sway {
+            0% { transform: rotate(-1deg); }
+            50% { transform: rotate(1deg); }
+            100% { transform: rotate(-1deg); }
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(1, 1); }
+            50% { transform: scale(1.02, 1.04) translate(-2px, -3px); }
+            100% { transform: scale(1, 1); }
+        }
+
+        @keyframes firefly-flicker {
+            0%, 100% { opacity: 0.2; transform: translateY(0) scale(1); }
+            50% { opacity: 0.9; transform: translateY(-15px) scale(1.2); }
+        }
+
+        /* Group Animations */
+        .swinging-group {
+            transform-origin: 400px 50px;
+            animation: sway 7s ease-in-out infinite;
+        }
+
+        .breathing-body {
+            transform-origin: 430px 440px; 
+            animation: breathe 4.5s ease-in-out infinite;
+        }
+
+        .firefly {
+            animation: firefly-flicker 4s ease-in-out infinite alternate;
+        }
+
+        /* Arm & Twig Realistic Mechanics */
+        #feeding-arm {
+            transform-origin: 340px 400px; /* Pivots at the shoulder */
+            transition: transform 0.6s ease-in-out;
+            transform: rotate(-12deg); /* Default resting state, pulled slightly away from face */
+        }
+
+        #feeding-arm.bring-to-mouth {
+            transform: rotate(0deg); /* Moves arm directly to the mouth */
+        }
+
+        #feeding-arm.reach-out {
+            transform: rotate(70deg); /* Reaches up to the stash vine */
+        }
+
+        #snack-twig {
+            /* This transition handles the twig sliding through his claws smoothly */
+            transition: transform 0.6s ease-in-out, opacity 0.3s ease-in;
+        }
+
+        /* Eye Blinking Logic */
+        .eye-open { display: block; }
+        .eye-closed { display: none; }
+        
+        .is-blinking .eye-open { display: none !important; }
+        .is-blinking .eye-closed { display: block !important; }
+        
+    </style>
+</head>
+<body>
+
+    <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" id="scene">
+        <defs>
+            <radialGradient id="bg-glow" cx="50%" cy="50%" r="70%" fx="40%" fy="40%">
+                <stop offset="0%" stop-color="#1c4731" />
+                <stop offset="60%" stop-color="#0a1c11" />
+                <stop offset="100%" stop-color="#050e08" />
+            </radialGradient>
+
+            <linearGradient id="fur-dark" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#694b37" />
+                <stop offset="100%" stop-color="#4a3222" />
+            </linearGradient>
+            
+            <linearGradient id="fur-light" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#8b684f" />
+                <stop offset="100%" stop-color="#694b37" />
+            </linearGradient>
+
+            <linearGradient id="face-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f4e0c8" />
+                <stop offset="100%" stop-color="#d9be9e" />
+            </linearGradient>
+            
+            <linearGradient id="branch-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#593f28" />
+                <stop offset="40%" stop-color="#422e1c" />
+                <stop offset="100%" stop-color="#2c1d10" />
+            </linearGradient>
+
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="2" dy="6" stdDeviation="4" flood-color="#000" flood-opacity="0.65"/>
+            </filter>
+            
+            <filter id="light-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/>
+            </filter>
+        </defs>
+
+        <rect width="800" height="600" fill="url(#bg-glow)" />
+
+        <g id="fireflies"></g>
+
+        <!-- Overhanging "Stash" Vine -->
+        <g opacity="0.8" filter="url(#shadow)">
+            <path d="M 350 -20 Q 320 150 280 340" stroke="#0e2918" stroke-width="12" fill="none" stroke-linecap="round"/>
+            <path d="M 280 340 Q 310 330 290 310 Z" fill="#2d5236" />
+            <path d="M 290 320 Q 260 330 270 300 Z" fill="#2d5236" />
+            <path d="M 300 280 Q 330 290 310 260 Z" fill="#2d5236" />
+        </g>
+
+        <!-- Background Leaves/Vines holding the main branch -->
+        <path d="M 50 -20 Q 80 200 40 450 Q 10 550 30 650" stroke="#0e2918" stroke-width="15" fill="none" opacity="0.6"/>
+        <path d="M 750 -10 Q 720 250 760 450 Q 790 550 740 650" stroke="#0e2918" stroke-width="20" fill="none" opacity="0.6"/>
+
+        <g class="swinging-group">
+            
+            <!-- LAYER 1: BACK LIMBS -->
+            <path d="M 500 380 Q 550 460 520 520" stroke="url(#fur-dark)" stroke-width="34" stroke-linecap="round" fill="none"/>
+            <path d="M 510 515 Q 505 525 515 530" stroke="#b0b0b0" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M 520 518 Q 515 528 525 533" stroke="#b0b0b0" stroke-width="3" fill="none" stroke-linecap="round"/>
+            
+            <path d="M 380 390 Q 430 440 410 500" stroke="url(#fur-dark)" stroke-width="32" stroke-linecap="round" fill="none"/>
+            <path d="M 400 495 Q 395 505 405 510" stroke="#b0b0b0" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M 410 498 Q 405 508 415 513" stroke="#b0b0b0" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+            <!-- LAYER 2: THE MAIN BRANCH -->
+            <path d="M -50 450 Q 200 460 400 450 T 850 430" stroke="url(#branch-gradient)" stroke-width="50" stroke-linecap="round" fill="none" filter="url(#shadow)"/>
+            <path d="M 50 435 Q 100 430 150 440" stroke="#4a6332" stroke-width="6" fill="none" stroke-linecap="round"/>
+            <path d="M 500 435 Q 550 445 600 430" stroke="#4a6332" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <path d="M 620 440 Q 650 390 680 430 Q 660 460 620 440" fill="#2d5236" filter="url(#shadow)"/>
+
+            <!-- LAYER 3: BODY AND HEAD -->
+            <g id="sloth-character">
+                <g class="breathing-body">
+                    <ellipse cx="430" cy="385" rx="95" ry="60" fill="url(#fur-light)" filter="url(#shadow)"/>
+                    <circle cx="360" cy="385" r="45" fill="url(#fur-light)" />
+                </g>
+
+                <g id="sloth-head">
+                    <circle cx="300" cy="390" r="50" fill="url(#fur-light)" filter="url(#shadow)"/>
+                    <circle cx="285" cy="400" r="38" fill="url(#face-gradient)" />
+                    
+                    <path d="M 245 395 Q 260 380 275 390 Q 265 410 245 395 Z" fill="#3a2315" opacity="0.8"/>
+                    <path d="M 275 395 Q 290 380 305 390 Q 295 410 275 395 Z" fill="#3a2315" opacity="0.8"/>
+
+                    <ellipse cx="265" cy="410" rx="8" ry="6" fill="#111" />
+                    <ellipse cx="262" cy="408" rx="2" ry="1.5" fill="#555" />
+
+                    <!-- Animated Mouth -->
+                    <g id="mouth-container">
+                        <path id="mouth-closed" d="M 255 420 Q 265 428 275 420" stroke="#222" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        <path id="mouth-open" d="M 255 420 Q 265 438 275 420 Z" fill="#111" display="none"/>
+                        <!-- Little leaf bit he chews on -->
+                        <path id="mouth-leaf-bit" d="M 260 423 Q 265 430 270 423" stroke="#6b9e4d" stroke-width="3" fill="none" stroke-linecap="round" display="none"/>
+                    </g>
+
+                    <g class="eye-open">
+                        <circle cx="258" cy="393" r="4.5" fill="#000" />
+                        <circle cx="256" cy="391" r="1.5" fill="#fff" />
+                    </g>
+                    <g class="eye-closed">
+                        <path d="M 252 393 Q 258 398 264 393" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    </g>
+
+                    <g class="eye-open">
+                        <circle cx="288" cy="393" r="4.5" fill="#000" />
+                        <circle cx="286" cy="391" r="1.5" fill="#fff" />
+                    </g>
+                    <g class="eye-closed">
+                        <path d="M 282 393 Q 288 398 294 393" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    </g>
+                </g>
+
+                <!-- LAYER 4: FRONT LIMBS -->
+                <!-- Non-animated Front Leg (Right side) -->
+                <path d="M 460 400 Q 500 480 460 540" stroke="url(#fur-light)" stroke-width="36" stroke-linecap="round" fill="none" filter="url(#light-shadow)"/>
+                <path d="M 450 535 Q 445 545 455 550" stroke="#e0e0e0" stroke-width="4" fill="none" stroke-linecap="round"/>
+                <path d="M 460 538 Q 455 548 465 553" stroke="#e0e0e0" stroke-width="4" fill="none" stroke-linecap="round"/>
+                <path d="M 470 535 Q 465 545 475 550" stroke="#e0e0e0" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+                <!-- Animated Front Arm -->
+                <g id="feeding-arm">
+                    
+                    <!-- The Twig with Leaves (It moves independently inside the arm group to simulate sliding through claws) -->
+                    <g id="snack-twig">
+                        <path d="M 270 470 Q 260 400 270 330" stroke="#4a3222" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        
+                        <!-- Leaves (Indexed 0 at the top, 4 at the bottom closest to mouth) -->
+                        <g id="leaf-4">
+                            <path d="M 268 420 Q 243 425 238 405 Q 263 405 268 420 Z" fill="#6b9e4d"/>
+                        </g>
+                        <g id="leaf-3">
+                            <path d="M 265 395 Q 285 390 290 370 Q 270 375 265 395 Z" fill="#6b9e4d"/>
+                        </g>
+                        <g id="leaf-2">
+                            <path d="M 266 370 Q 241 375 236 355 Q 261 355 266 370 Z" fill="#6b9e4d"/>
+                        </g>
+                        <g id="leaf-1">
+                            <path d="M 267 345 Q 287 340 292 320 Q 272 325 267 345 Z" fill="#6b9e4d"/>
+                        </g>
+                        <g id="leaf-0">
+                            <path d="M 269 320 Q 244 325 239 305 Q 264 305 269 320 Z" fill="#6b9e4d"/>
+                        </g>
+                    </g>
+
+                    <!-- Arm Path -->
+                    <path d="M 340 400 Q 300 480 270 460" stroke="url(#fur-light)" stroke-width="32" stroke-linecap="round" fill="none" filter="url(#light-shadow)"/>
+                    
+                    <!-- Claws wrapped around the branch -->
+                    <path d="M 255 455 Q 260 465 270 460" stroke="#e0e0e0" stroke-width="4" fill="none" stroke-linecap="round"/>
+                    <path d="M 260 458 Q 265 468 275 463" stroke="#e0e0e0" stroke-width="4" fill="none" stroke-linecap="round"/>
+                    <path d="M 265 461 Q 270 471 280 466" stroke="#e0e0e0" stroke-width="4" fill="none" stroke-linecap="round"/>
+                </g>
+
+            </g>
+        </g>
+        
+        <path d="M -20 -20 Q 50 80 -10 180 Z" fill="#143621" filter="url(#shadow)"/>
+        <path d="M 820 -20 Q 750 80 810 180 Z" fill="#143621" filter="url(#shadow)"/>
+        <path d="M -20 620 Q 80 550 -10 450 Z" fill="#143621" filter="url(#shadow)"/>
+        <path d="M 820 620 Q 720 520 810 420 Z" fill="#143621" filter="url(#shadow)"/>
+
+    </svg>
+
+    <script>
+        const sloth = document.getElementById('sloth-character');
+        const firefliesContainer = document.getElementById('fireflies');
+        
+        const leaves = [
+            document.getElementById('leaf-0'), // Top leaf
+            document.getElementById('leaf-1'),
+            document.getElementById('leaf-2'),
+            document.getElementById('leaf-3'),
+            document.getElementById('leaf-4')  // Bottom leaf (closest to mouth)
+        ];
+        
+        const mouthClosed = document.getElementById('mouth-closed');
+        const mouthOpen = document.getElementById('mouth-open');
+        const mouthLeafBit = document.getElementById('mouth-leaf-bit');
+        const feedingArm = document.getElementById('feeding-arm');
+        const snackTwig = document.getElementById('snack-twig');
+
+        let currentLeaf = 4; // Start at the bottom
+        
+        // Pixel offsets required to slide each leaf precisely down to the mouth level
+        const twigSlideOffsets = [100, 75, 50, 25, 0];
+        
+        const config = {
+            blinkInterval: { min: 2000, max: 7000 },  
+            blinkDuration: 150,                       
+            eatInterval: { min: 1800, max: 3500 }
+        };
+
+        function random(min, max) { return Math.floor(Math.random() * (max - min + 1) + min); }
+        function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+        function createFireflies(count) {
+            for (let i = 0; i < count; i++) {
+                const firefly = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                const cx = random(50, 750), cy = random(50, 550), r = random(1, 3) + (Math.random() * 0.5);
+                firefly.setAttribute("cx", cx); firefly.setAttribute("cy", cy); firefly.setAttribute("r", r);
+                firefly.setAttribute("fill", "#e8e084"); firefly.setAttribute("class", "firefly");
+                firefly.style.animationDuration = `${random(3000, 6000)}ms`;
+                firefly.style.animationDelay = `${random(0, 5000)}ms`;
+                firefly.style.filter = "drop-shadow(0px 0px 4px #e8e084)";
+                firefliesContainer.appendChild(firefly);
+            }
+        }
+
+        function startBlinking() {
+            setTimeout(() => {
+                sloth.classList.add('is-blinking');
+                setTimeout(() => {
+                    sloth.classList.remove('is-blinking');
+                    startBlinking(); 
+                }, config.blinkDuration);
+            }, random(config.blinkInterval.min, config.blinkInterval.max));
+        }
+
+        function chew() {
+            return new Promise(resolve => {
+                let chews = 0;
+                // Sluggish sloth chewing pace
+                const chewSpeed = 300; 
+                const maxChews = 6; 
+                
+                const chewInterval = setInterval(() => {
+                    if (chews % 2 === 0) {
+                        mouthClosed.style.display = 'none';
+                        mouthOpen.style.display = 'block';
+                        mouthLeafBit.style.display = 'block';
+                    } else {
+                        mouthClosed.style.display = 'block';
+                        mouthOpen.style.display = 'none';
+                        mouthLeafBit.style.display = 'none';
+                    }
+                    chews++;
+                    
+                    if (chews >= maxChews) {
+                        clearInterval(chewInterval);
+                        mouthClosed.style.display = 'block';
+                        mouthOpen.style.display = 'none';
+                        mouthLeafBit.style.display = 'none';
+                        resolve();
+                    }
+                }, chewSpeed); 
+            });
+        }
+
+        async function grabNewTwig() {
+            // Drop empty stick
+            snackTwig.style.transition = 'transform 1s ease-in, opacity 0.8s ease-in';
+            snackTwig.style.transform = `translateY(250px) rotate(-20deg)`;
+            snackTwig.style.opacity = '0';
+            await delay(1000); 
+
+            // Reach arm up
+            feedingArm.classList.add('reach-out');
+            await delay(1200); 
+
+            // Snap new twig into hand instantly
+            snackTwig.style.transition = 'none';
+            snackTwig.style.transform = 'translateY(0px)';
+            snackTwig.style.opacity = '1';
+            leaves.forEach(leaf => leaf.style.display = 'block');
+            currentLeaf = 4; 
+            
+            // Force browser repaint to recognize the instant state
+            void snackTwig.offsetWidth;
+            
+            // Restore smooth sliding transitions
+            snackTwig.style.transition = 'transform 0.6s ease-in-out, opacity 0.3s ease-in';
+            await delay(300); 
+
+            // Bring arm back to resting pose
+            feedingArm.classList.remove('reach-out');
+            await delay(1000); 
+
+            eatNextLeaf();
+        }
+
+        async function eatNextLeaf() {
+            if (currentLeaf < 0) {
+                await grabNewTwig();
+                return;
+            }
+
+            // 1. Wait in resting pose holding the twig
+            await delay(random(config.eatInterval.min, config.eatInterval.max));
+
+            // 2. Slide the twig down through his claws to align the correct leaf 
+            // AND bring his arm inward to his mouth.
+            snackTwig.style.transform = `translateY(${twigSlideOffsets[currentLeaf]}px)`;
+            feedingArm.classList.add('bring-to-mouth');
+            
+            await delay(600); // Wait for the motion to reach his face
+            
+            // 3. Open mouth
+            mouthClosed.style.display = 'none';
+            mouthOpen.style.display = 'block';
+            await delay(250);
+            
+            // 4. Bite!
+            leaves[currentLeaf].style.display = 'none';
+            currentLeaf--;
+            
+            // 5. Close mouth and immediately pull arm back out to resting pose
+            mouthClosed.style.display = 'block';
+            mouthOpen.style.display = 'none';
+            feedingArm.classList.remove('bring-to-mouth');
+            
+            // 6. Chew the bite slowly
+            await chew();
+            
+            // Loop
+            eatNextLeaf();
+        }
+
+        function init() {
+            createFireflies(30);
+            startBlinking();
+            setTimeout(eatNextLeaf, 1500);
+        }
+
+        window.onload = init;
+        
+    </script>
+</body>
+</html>
