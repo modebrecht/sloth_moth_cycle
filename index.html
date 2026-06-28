@@ -1543,6 +1543,106 @@
       object-fit:cover;
     }
     .slide[data-title="Final task"] .scene-gallery .scene-panel{overflow:hidden;}
+
+    .writing-layout {
+      width:100%;
+      margin:12px 0;
+      transition: all 0.3s ease;
+    }
+    .writing-layout.split-mode {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 20px !important;
+      align-items: stretch;
+    }
+    .writing-textarea-side {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .writing-vocab-side {
+      display: flex;
+      flex-direction: column;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(16,41,31,0.12);
+      border-radius: 22px;
+      padding: 16px;
+      max-height: 480px;
+      overflow-y: auto;
+      box-shadow: var(--soft-shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .writing-vocab-side h3 {
+      margin: 0 0 12px 0 !important;
+      font-size: 1.1rem !important;
+      color: #1e6046 !important;
+    }
+    .writing-vocab-side h3 .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: #f0f0f0;
+      color: #666;
+      transition: all 0.25s ease;
+      border: 1px solid #e0e0e0;
+    }
+    .writing-vocab-side h3 .badge.success {
+      background: #e6f7e6;
+      color: #2b6345;
+      border: 1px solid #cceccc;
+    }
+    .vocab-book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .vocab-book-grid .vocab-card {
+      min-height: 140px !important;
+    }
+    .vocab-book-grid .vocab-inner {
+      min-height: 140px !important;
+    }
+    .vocab-book-grid .vocab-face {
+      padding: 12px !important;
+      border-radius: 16px !important;
+    }
+    .vocab-book-grid .vocab-card.used-in-essay .vocab-face {
+      border: 2px solid #2b6345 !important;
+      background: linear-gradient(180deg, #f3faf3, #e6f7e6) !important;
+    }
+    .vocab-book-grid .vocab-card.used-in-essay::after {
+      content: "✅";
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: 0.9rem;
+      z-index: 10;
+    }
+    .vocab-book-grid .word {
+      font-size: 0.95rem !important;
+    }
+    .vocab-book-grid .back-word {
+      font-size: 0.95rem !important;
+    }
+    .vocab-book-grid .definition {
+      font-size: 0.76rem !important;
+      line-height: 1.3 !important;
+    }
+    .vocab-book-grid .reveal-tag {
+      font-size: 0.72rem !important;
+    }
+    @media (max-width: 760px) {
+      .writing-layout.split-mode {
+        grid-template-columns: 1fr !important;
+      }
+      .writing-vocab-side {
+        max-height: 350px;
+      }
+    }
     .slide[data-title="Final task"] .selfcheck-section{margin-top:16px;}
     .slide[data-title="Final task"] .selfcheck-section h3{
       margin:0 0 12px;
@@ -3102,8 +3202,35 @@
 <h2>Explain the relationship</h2>
 <div class="final-box">
 <p><strong>Write 120+ words in English.</strong> Explain how the sloth, the moth and the algae are connected. Use at least five vocabulary words.</p>
-<textarea id="finalText" placeholder="The sloth, the moth and the algae have a complex relationship. …"></textarea>
-<div class="pillbox"><span class="pill">Words: <span id="wordCount">0</span></span><span class="pill">Target: 120+</span></div>
+
+<div class="writing-layout">
+  <div class="writing-textarea-side">
+    <textarea id="finalText" placeholder="The sloth, the moth and the algae have a complex relationship. …"></textarea>
+    <div class="pillbox" style="margin-top:8px;"><span class="pill">Words: <span id="wordCount">0</span></span><span class="pill">Target: 120+</span></div>
+  </div>
+
+  <div class="writing-vocab-side" id="vocabBookPanel" hidden style="display:none;">
+    <h3 style="display:flex;align-items:center;justify-content:space-between;width:100%;margin:0 0 12px 0;">
+      <span>📖 Wortschatz-Hilfe</span>
+      <span class="badge" id="vocabBookCountBadge">0 / 5 verwendet</span>
+    </h3>
+    <div class="vocab-book-grid" id="vocabBookGrid">
+      <div aria-label="Reveal symbiosis" class="vocab-card" role="button" tabindex="0"><div class="vocab-inner"><div class="vocab-face vocab-front"><div class="word">symbiosis <span aria-hidden="true" class="icon-svg icon-symbiosis"><svg aria-label="symbiosis icon" role="img" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" fill="#f7fff7" r="28" stroke="#dcefdc" stroke-width="2"></circle><circle cx="24" cy="26" fill="#74d38f" r="9" stroke="#2c8b58" stroke-width="2.2"></circle><circle cx="40" cy="38" fill="#8ad9ee" r="9" stroke="#3d8fb0" stroke-width="2.2"></circle><path d="M28 30c2.5 4 5.5 5.7 8.5 6.3" fill="none" stroke="#4b6a58" stroke-linecap="round" stroke-width="3"></path><path d="M38 24c4 1 7.5 3.5 9.5 7.3" fill="none" stroke="#d39b2f" stroke-linecap="round" stroke-width="3"></path><path d="M18.5 39c4.8 2.8 9.6 2.7 14.1-.3" fill="none" stroke="#d39b2f" stroke-linecap="round" stroke-width="3"></path><circle cx="47" cy="31" fill="#ffd56c" r="2.3"></circle><circle cx="19" cy="37" fill="#ffd56c" r="2.3"></circle></svg></span></div><div class="reveal-tag">Tap to reveal <span aria-hidden="true" class="tiny-svg tiny-spark"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5l1.95 5.55L19.5 10l-5.55 1.95L12 17.5l-1.95-5.55L4.5 10l5.55-1.95Z" fill="#ffd15a" stroke="#b98218" stroke-linejoin="round" stroke-width="1.2"></path></svg></span></div></div><div class="vocab-face vocab-back"><div><div class="back-top"><div class="back-word">symbiosis</div></div><div class="definition">a close relationship between two different species</div></div></div></div></div>
+      <div aria-label="Reveal mutualism" class="vocab-card" role="button" tabindex="0"><div class="vocab-inner"><div class="vocab-face vocab-front"><div class="word">mutualism <span aria-hidden="true" class="icon-svg icon-mutualism"><svg aria-label="mutualism icon" role="img" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" fill="#fffaf0" r="28" stroke="#ebdec2" stroke-width="2"></circle><path d="M19 36c4-6 8-8 13-8 5 0 8 2 13 8" fill="none" stroke="#8d6238" stroke-linecap="round" stroke-width="4.5"></path><path d="M16 30c3-7 9-11 15-10-1 7-5 13-12 16-4 2-6-2-3-6Z" fill="#81d489" stroke="#2f8a52" stroke-width="2"></path><path d="M48 30c-3-7-9-11-15-10 1 7 5 13 12 16 4 2 6-2 3-6Z" fill="#83d7e8" stroke="#3c91ad" stroke-width="2"></path><path d="M23 39c4 4 14 4 18 0" fill="none" stroke="#f2c14d" stroke-linecap="round" stroke-width="3.4"></path></svg></span></div><div class="reveal-tag">Tap to reveal <span aria-hidden="true" class="tiny-svg tiny-spark"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5l1.95 5.55L19.5 10l-5.55 1.95L12 17.5l-1.95-5.55L4.5 10l5.55-1.95Z" fill="#ffd15a" stroke="#b98218" stroke-linejoin="round" stroke-width="1.2"></path></svg></span></div></div><div class="vocab-face vocab-back"><div><div class="back-top"><div class="back-word">mutualism</div></div><div class="definition">a relationship where both species benefit</div></div></div></div></div>
+      <div aria-label="Reveal fur" class="vocab-card" role="button" tabindex="0"><div class="vocab-inner"><div class="vocab-face vocab-front"><div class="word">fur <span aria-hidden="true" class="icon-svg icon-fur"><svg aria-label="fur icon" role="img" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="furBookHQ" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#f9e2bc"></stop><stop offset="48%" stop-color="#d19863"></stop><stop offset="100%" stop-color="#85502e"></stop></linearGradient></defs><circle cx="32" cy="32" fill="#fff8ef" r="28" stroke="#eedfc3" stroke-width="2"></circle><path d="M18 44c0-5 2-9 6-12l-1-8 5 5 4-7 3 8 6-5-1 8c4 3 6 7 6 12 0 6-5 10-14 10S18 50 18 44Z" fill="url(#furBookHQ)" stroke="#7a4525" stroke-linejoin="round" stroke-width="2.2"></path><path d="M26 27l1.5 6M32 24l0 8M38 27l-1.5 6" stroke="#8d5b35" stroke-linecap="round" stroke-width="2.5"></path><path d="M24 43c5 3 11 3 16 0" fill="none" opacity=".95" stroke="#fcefd7" stroke-linecap="round" stroke-width="2.2"></path></svg></span></div><div class="reveal-tag">Tap to reveal <span aria-hidden="true" class="tiny-svg tiny-spark"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5l1.95 5.55L19.5 10l-5.55 1.95L12 17.5l-1.95-5.55L4.5 10l5.55-1.95Z" fill="#ffd15a" stroke="#b98218" stroke-linejoin="round" stroke-width="1.2"></path></svg></span></div></div><div class="vocab-face vocab-back"><div><div class="back-top"><div class="back-word">fur</div></div><div class="definition">the hair that covers an animal’s body</div></div></div></div></div>
+      <div aria-label="Reveal algae" class="vocab-card" role="button" tabindex="0"><div class="vocab-inner"><div class="vocab-face vocab-front"><div class="word">algae <span aria-hidden="true" class="icon-svg icon-algae"><svg aria-label="algae icon" role="img" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" fill="#f4fff5" r="28" stroke="#d7eed7" stroke-width="2"></circle><path d="M22 47c-4-11-2-22 5-31" fill="none" stroke="#2d9d54" stroke-linecap="round" stroke-width="4"></path><path d="M32 49c-3-13 0-24 8-33" fill="none" stroke="#47b95f" stroke-linecap="round" stroke-width="4"></path><path d="M42 45c0-10 4-18 10-24" fill="none" stroke="#3ca968" stroke-linecap="round" stroke-width="4"></path><circle cx="21" cy="33" fill="#9ce27f" r="5.2" stroke="#3a984a" stroke-width="2"></circle><circle cx="28.5" cy="24" fill="#b8ef8e" r="4.1" stroke="#3a984a" stroke-width="2"></circle><circle cx="37" cy="36" fill="#79d770" r="4.8" stroke="#3a984a" stroke-width="2"></circle><circle cx="45" cy="28" fill="#9fe98f" r="4.8" stroke="#3a984a" stroke-width="2"></circle><circle cx="41.5" cy="45" fill="#c6f5a0" r="4" stroke="#3a984a" stroke-width="2"></circle></svg></span></div><div class="reveal-tag">Tap to reveal <span aria-hidden="true" class="tiny-svg tiny-spark"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5l1.95 5.55L19.5 10l-5.55 1.95L12 17.5l-1.95-5.55L4.5 10l5.55-1.95Z" fill="#ffd15a" stroke="#b98218" stroke-linejoin="round" stroke-width="1.2"></path></svg></span></div></div><div class="vocab-face vocab-back"><div><div class="back-top"><div class="back-word">algae</div></div><div class="definition">simple plant-like organisms that can grow in wet places</div></div></div></div></div>
+      <div aria-label="Reveal nutrients" class="vocab-card" role="button" tabindex="0"><div class="vocab-inner"><div class="vocab-face vocab-front"><div class="word">nutrients <span aria-hidden="true" class="icon-svg icon-nutrients"><svg aria-label="nutrients icon" role="img" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" fill="#fff9ef" r="28" stroke="#ebddc0" stroke-width="2"></circle><path d="M31 17v29" stroke="#8f663c" stroke-linecap="round" stroke-width="4"></path><path d="M31 29c-9-2-14-7-16-14 9-1 16 3 20 11" fill="#7fd285" stroke="#368c4c" stroke-width="2"></path><path d="M33 35c6-6 14-7 20-3-4 8-11 11-20 9" fill="#a9df6c" stroke="#599c43" stroke-width="2"></path><path d="M22 46c3-2 6-3 9-3 3 0 6 1 11 4" fill="none" stroke="#a27444" stroke-linecap="round" stroke-width="3"></path><circle cx="47" cy="18" fill="#ffd267" r="5" stroke="#d59a2e" stroke-width="2"></circle><circle cx="18" cy="25" fill="#9ee0ff" r="3.2" stroke="#4b9ac0" stroke-width="1.8"></circle></svg></span></div><div class="reveal-tag">Tap to reveal <span aria-hidden="true" class="tiny-svg tiny-spark"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5l1.95 5.55L19.5 10l-5.55 1.95L12 17.5l-1.95-5.55L4.5 10l5.55-1.95Z" fill="#ffd15a" stroke="#b98218" stroke-linejoin="round" stroke-width="1.2"></path></svg></span></div></div><div class="vocab-face vocab-back"><div><div class="back-top"><div class="back-word">nutrients</div></div><div class="definition">substances that living things need to grow and stay healthy</div></div></div></div></div>
+      <div aria-label="Reveal canopy" class="vocab-card" role="button" tabindex="0"><div class="vocab-inner"><div class="vocab-face vocab-front"><div class="word">canopy <span aria-hidden="true" class="icon-svg icon-canopy"><svg aria-label="canopy icon" role="img" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" fill="#f5fff5" r="28" stroke="#daefdb" stroke-width="2"></circle><path d="M17 44h30" stroke="#7e5b37" stroke-linecap="round" stroke-width="3.5"></path><path d="M23 44V33M32 44V28M41 44V34" stroke="#7e5b37" stroke-linecap="round" stroke-width="3.2"></path><circle cx="23" cy="29" fill="#7dd17d" r="8" stroke="#3d964d" stroke-width="2"></circle><circle cx="32" cy="22" fill="#96dc73" r="10" stroke="#4a9d49" stroke-width="2"></circle><circle cx="41" cy="29" fill="#6fc87d" r="8" stroke="#3d964d" stroke-width="2"></circle><path d="M21 18c6-6 18-7 24 0" fill="none" opacity=".9" stroke="#d6f0a6" stroke-linecap="round" stroke-width="2"></path></svg></span></div><div class="reveal-tag">Tap to reveal <span aria-hidden="true" class="tiny-svg tiny-spark"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5l1.95 5.55L19.5 10l-5.55 1.95L12 17.5l-1.95-5.55L4.5 10l5.55-1.95Z" fill="#ffd15a" stroke="#b98218" stroke-linejoin="round" stroke-width="1.2"></path></svg></span></div></div><div class="vocab-face vocab-back"><div><div class="back-top"><div class="back-word">canopy</div></div><div class="definition">the high layer of leaves and branches in a forest</div></div></div></div></div>
+      <div aria-label="Reveal larvae" class="vocab-card" role="button" tabindex="0"><div class="vocab-inner"><div class="vocab-face vocab-front"><div class="word">larvae <span aria-hidden="true" class="icon-svg icon-larvae"><svg aria-label="larvae icon" role="img" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" fill="#fffaf1" r="28" stroke="#ebdfc7" stroke-width="2"></circle><circle cx="20" cy="35" fill="#a8df74" r="6" stroke="#4b9448" stroke-width="2"></circle><circle cx="28" cy="32" fill="#b7ea82" r="6" stroke="#4b9448" stroke-width="2"></circle><circle cx="36" cy="31" fill="#9cd86c" r="6" stroke="#4b9448" stroke-width="2"></circle><circle cx="44" cy="33" fill="#bfe98a" r="5.8" stroke="#4b9448" stroke-width="2"></circle><circle cx="49.5" cy="35" fill="#8ed262" r="4.8" stroke="#4b9448" stroke-width="2"></circle><circle cx="48" cy="33.5" fill="#2d4d28" r=".9"></circle><path d="M17.5 30.5l-3-3M20 28l-1-4M48.5 28l2.8-2.8" stroke="#5b7c43" stroke-linecap="round" stroke-width="2"></path></svg></span></div><div class="reveal-tag">Tap to reveal <span aria-hidden="true" class="tiny-svg tiny-spark"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5l1.95 5.55L19.5 10l-5.55 1.95L12 17.5l-1.95-5.55L4.5 10l5.55-1.95Z" fill="#ffd15a" stroke="#b98218" stroke-linejoin="round" stroke-width="1.2"></path></svg></span></div></div><div class="vocab-face vocab-back"><div><div class="back-top"><div class="back-word">larvae</div></div><div class="definition">young insects after they hatch from eggs</div></div></div></div></div>
+      <div aria-label="Reveal camouflage" class="vocab-card" role="button" tabindex="0"><div class="vocab-inner"><div class="vocab-face vocab-front"><div class="word">camouflage <span aria-hidden="true" class="icon-svg icon-camouflage"><svg aria-label="camouflage icon" role="img" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" fill="#f7fff2" r="28" stroke="#ddeed1" stroke-width="2"></circle><path d="M17 37c7-16 20-22 32-18-3 14-14 27-31 27-3 0-4-4-1-9Z" fill="#89cf73" stroke="#4a9348" stroke-width="2.2"></path><path d="M28 24c4 5 8 9 13 12" fill="none" stroke="#d8efb5" stroke-linecap="round" stroke-width="2.5"></path><path d="M24 42c7-4 12-8 16-13" fill="none" stroke="#5d9f56" stroke-linecap="round" stroke-width="2.4"></path><circle cx="39" cy="31" fill="#fff7e7" r="4.3" stroke="#bb9b5a" stroke-width="1.7"></circle><circle cx="39" cy="31" fill="#2c3820" r="1.7"></circle></svg></span></div><div class="reveal-tag">Tap to reveal <span aria-hidden="true" class="tiny-svg tiny-spark"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5l1.95 5.55L19.5 10l-5.55 1.95L12 17.5l-1.95-5.55L4.5 10l5.55-1.95Z" fill="#ffd15a" stroke="#b98218" stroke-linejoin="round" stroke-width="1.2"></path></svg></span></div></div><div class="vocab-face vocab-back"><div><div class="back-top"><div class="back-word">camouflage</div></div><div class="definition">colour or shape that helps an animal hide</div></div></div></div></div>
+      <div aria-label="Reveal evidence" class="vocab-card" role="button" tabindex="0"><div class="vocab-inner"><div class="vocab-face vocab-front"><div class="word">evidence <span aria-hidden="true" class="icon-svg icon-evidence"><svg aria-label="evidence icon" role="img" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" fill="#f7fbff" r="28" stroke="#d7e8f4" stroke-width="2"></circle><rect fill="#ffffff" height="28" rx="4" stroke="#8eb4c8" stroke-width="2" width="20" x="18" y="16"></rect><path d="M23 24h10M23 29h10M23 34h7" stroke="#82a9bf" stroke-linecap="round" stroke-width="2.2"></path><circle cx="40" cy="38" fill="#e8f8ff" r="9" stroke="#4e9cc1" stroke-width="2.5"></circle><path d="M46.8 44.8l5.7 5.7" stroke="#4e9cc1" stroke-linecap="round" stroke-width="4"></path><circle cx="40" cy="38" fill="#9bd2ea" opacity=".8" r="3.3"></circle></svg></span></div><div class="reveal-tag">Tap to reveal <span aria-hidden="true" class="tiny-svg tiny-spark"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5l1.95 5.55L19.5 10l-5.55 1.95L12 17.5l-1.95-5.55L4.5 10l5.55-1.95Z" fill="#ffd15a" stroke="#b98218" stroke-linejoin="round" stroke-width="1.2"></path></svg></span></div></div><div class="vocab-face vocab-back"><div><div class="back-top"><div class="back-word">evidence</div></div><div class="definition">information that helps show if something is true</div></div></div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="pillbox" style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+  <button class="ghost" id="toggleVocabBookBtn" onclick="toggleVocabBook()">📖 Wortschatz-Buch öffnen</button>
+</div>
 </div>
 <div class="selfcheck-section">
 <h3>Self-check</h3>
@@ -3219,6 +3346,80 @@
     }
     function nextSlide(){goToSlide(current + 1)}
     function prevSlide(){goToSlide(current - 1)}
+    function toggleVocabBook(){
+      const panel = document.getElementById('vocabBookPanel');
+      const layout = document.querySelector('.writing-layout');
+      const btn = document.getElementById('toggleVocabBookBtn');
+      if (panel.style.display === 'none' || panel.hidden) {
+        panel.style.display = 'block';
+        panel.hidden = false;
+        layout.classList.add('split-mode');
+        btn.textContent = '📖 Wortschatz-Buch schließen';
+      } else {
+        panel.style.display = 'none';
+        panel.hidden = true;
+        layout.classList.remove('split-mode');
+        btn.textContent = '📖 Wortschatz-Buch öffnen';
+      }
+      setTimeout(scheduleSave, 0);
+    }
+    function checkFinalEssayVocabulary() {
+      const text = (document.getElementById('finalText')?.value || '').toLowerCase();
+      const vocabWords = {
+        symbiosis: [/symbios/i],
+        mutualism: [/mutualis/i],
+        fur: [/\bfur\b/i, /\bfurs\b/i],
+        algae: [/algae/i, /alga/i],
+        nutrients: [/nutrient/i],
+        canopy: [/canop/i],
+        larvae: [/larva/i, /larvae/i],
+        camouflage: [/camouflag/i],
+        evidence: [/evidenc/i]
+      };
+
+      let usedCount = 0;
+      const bookCards = document.querySelectorAll('#vocabBookGrid .vocab-card');
+      
+      bookCards.forEach(card => {
+        const wordEl = card.querySelector('.word') || card.querySelector('.back-word');
+        if (!wordEl) return;
+        const wordText = wordEl.textContent.trim().toLowerCase().split(' ')[0];
+        
+        let isUsed = false;
+        const patterns = vocabWords[wordText];
+        if (patterns) {
+          isUsed = patterns.some(regex => regex.test(text));
+        } else {
+          isUsed = text.includes(wordText);
+        }
+        
+        if (isUsed) {
+          card.classList.add('used-in-essay');
+          usedCount++;
+        } else {
+          card.classList.remove('used-in-essay');
+        }
+      });
+      
+      const selfcheckList = document.querySelectorAll('.selfcheck-list .selfcheck');
+      if (selfcheckList && selfcheckList[0]) {
+        const oldChecked = selfcheckList[0].checked;
+        selfcheckList[0].checked = (usedCount >= 5);
+        if (oldChecked !== selfcheckList[0].checked) {
+          selfcheckList[0].dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+      
+      const countBadge = document.getElementById('vocabBookCountBadge');
+      if (countBadge) {
+        countBadge.textContent = `${usedCount} / 5 verwendet`;
+        if (usedCount >= 5) {
+          countBadge.classList.add('success');
+        } else {
+          countBadge.classList.remove('success');
+        }
+      }
+    }
     document.addEventListener('keydown', (e)=>{
       if(printView) return;
       if(e.key === 'ArrowRight') nextSlide();
@@ -3537,6 +3738,7 @@
       const count = wordCount($('#finalText').value);
       $('#wordCount').textContent = count;
       setFinalGlow(count);
+      if(typeof checkFinalEssayVocabulary === 'function') checkFinalEssayVocabulary();
     });
     
     function makeWorksheetJSON(){
@@ -4575,7 +4777,7 @@
       currentSlide: typeof current === 'number' ? current : 0,
       xp: typeof xp === 'number' ? xp : 0,
       xpKeys: (typeof XP_EARNED_KEYS !== 'undefined') ? Array.from(XP_EARNED_KEYS) : [],
-      openVocabCards: Array.from(document.querySelectorAll('#vocabGrid .vocab-card')).map(card => card.classList.contains('open')),
+      openVocabCards: Array.from(document.querySelectorAll('.vocab-card')).map(card => card.classList.contains('open')),
       selectedButtons: selectedButtonState(),
       form,
       quizFeedback,
@@ -4614,7 +4816,7 @@
     });
 
     if(Array.isArray(state.openVocabCards)){
-      document.querySelectorAll('#vocabGrid .vocab-card').forEach((card, index) => {
+      document.querySelectorAll('.vocab-card').forEach((card, index) => {
         card.classList.toggle('open', !!state.openVocabCards[index]);
         if(state.openVocabCards[index]) card.dataset.xp = 'true';
       });
@@ -4669,6 +4871,7 @@
     if(finalText && wordCountEl && typeof wordCount === 'function'){
       wordCountEl.textContent = wordCount(finalText.value);
       if(typeof setFinalGlow === 'function') setFinalGlow(wordCount(finalText.value));
+      if(typeof checkFinalEssayVocabulary === 'function') checkFinalEssayVocabulary();
     }
 
     try{ updateJuiceHud?.(); updateSlideUI?.(); }catch(e){}
