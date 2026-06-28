@@ -1771,6 +1771,13 @@
     .symbiosis-image-row .slide-image-card img{height:clamp(220px,26vw,350px);}
     .moths-main-crop img{object-position:36% center;}
     .moths-detail-crop img{object-position:73% center;}
+    button.export-locked:disabled{
+      cursor:not-allowed;
+      opacity:.58;
+      filter:saturate(.55);
+      box-shadow:none;
+    }
+    #finalExportStatus.export-ready{color:#16653b;font-weight:900;}
     @media(max-width:760px){
       .slide-image-row.two-images{grid-template-columns:1fr;}
       .slide-image-card img,
@@ -1986,7 +1993,7 @@
 </div>
 <div class="top-actions">
 <button class="ghost" id="viewBtn" onclick="togglePrintView()">📄 All slides</button>
-<button class="ghost" onclick="window.print()">🖨 Print</button>
+<button class="ghost export-locked" data-final-export id="headerPdfBtn" onclick="requestPDF()" disabled>🔒 PDF · 100 XP</button>
 </div>
 </div>
 </header>
@@ -2572,7 +2579,7 @@
 <p><strong>Write 70–100 words in English.</strong> Explain how the sloth, the moth and the algae are connected. Use at least five vocabulary words.</p>
 <p class="mini">Useful sentence starters: <em>The moth benefits because … / The sloth may benefit because … / The algae can grow because … / Scientists think … / The evidence suggests …</em></p>
 <textarea id="finalText" placeholder="The sloth, the moth and the algae have a complex relationship. …"></textarea>
-<div class="pillbox"><span class="pill">Words: <span id="wordCount">0</span></span><span class="pill">Target: 70–100</span></div>
+<div class="pillbox"><span class="pill">Words: <span id="wordCount">0</span></span><span class="pill">Target: 120+</span></div>
 </div>
 <h3>Self-check before you finish</h3>
 <div class="grid-2">
@@ -2583,8 +2590,10 @@
 </div>
 <div class="pillbox">
 <button onclick="makeCopyText()">📋 Create copy text</button>
-<button class="secondary" onclick="window.print()">🖨 Print / save as PDF</button>
+<button class="secondary export-locked" data-final-export id="finalPdfBtn" onclick="requestPDF()" disabled>🔒 PDF · defeat Final Boss</button>
+<button class="plain export-locked" data-final-export id="jsonDownloadBtn" onclick="downloadWorksheetJSON()" disabled>🔒 JSON · defeat Final Boss</button>
 </div>
+<p class="micro-help" id="finalExportStatus">PDF and JSON unlock at 100 XP, with 120+ words and all four self-checks complete.</p>
 <pre class="copybox" id="copyBox"></pre>
 </section>
 </main>
@@ -2989,7 +2998,186 @@
       const count = wordCount($('#finalText').value);
       $('#wordCount').textContent = count;
       setFinalGlow(count);
+      checkFinalBossStatus();
     });
+    $$('.selfcheck').forEach(checkbox => {
+      checkbox.addEventListener('change', checkFinalBossStatus);
+    });
+    function checkFinalBossStatus(){
+      const finalText = $('#finalText');
+      const wordCount$ = wordCount(finalText.value);
+      const allChecks = $$('.selfcheck').every(c => c.checked);
+      const hasMinWords = wordCount$ >= 120;
+      const canExport = xp >= 100 && hasMinWords && allChecks;
+      
+      const pdfBtn = $('#finalPdfBtn');
+      const jsonBtn = $('#jsonDownloadBtn');
+      const statusEl = $('#finalExportStatus');
+      
+      if(pdfBtn) pdfBtn.disabled = !canExport;
+      if(jsonBtn) jsonBtn.disabled = !canExport;
+      
+      if(statusEl){
+        if(canExport){
+          statusEl.classList.add('export-ready');
+          statusEl.innerHTML = '<strong>✅ Final Boss unlocked!</strong> You can now download PDF & JSON';
+        }else{
+          statusEl.classList.remove('export-ready');
+          const missing = [];
+          if(xp < 100) missing.push(`${100-xp} more XP`);
+          if(!hasMinWords) missing.push(`${120-wordCount$} more words`);
+          if(!allChecks) missing.push('complete all 4 self-checks');
+          statusEl.innerHTML = `PDF and JSON unlock: ${missing.join(' · ')}`;
+        }
+      }
+    }
+    
+    function makeWorksheetJSON(){
+      return {
+        title: 'Sloth, Moth & Algae – Worksheet',
+        timestamp: new Date().toISOString(),
+        xp: xp,
+        prediction: $('#predictionBox').value.trim(),
+        surprises: $('#surpriseBox').value.trim(),
+        evidence: $('#evidenceBox').value.trim(),
+        research: [
+          {
+            fact: $('#fact1').value.trim(),
+            source: $('#source1').value.trim()
+          },
+          {
+            fact: $('#fact2').value.trim(),
+            source: $('#source2').value.trim()
+          }
+        ],
+        finalExplanation: $('#finalText').value.trim(),
+        wordCount: wordCount($('#finalText').value),
+        selfChecks: {
+          vocabularyUsed: $('#finalText').parentElement.querySelector('.selfcheck:nth-of-type(1)').checked,
+          benefitsExplained: $('#finalText').parentElement.querySelector('.selfcheck:nth-of-type(2)').checked,
+          carefulLanguage: $('#finalText').parentElement.querySelector('.selfcheck:nth-of-type(3)').checked,
+          extraFacts: $('#finalText').parentElement.querySelector('.selfcheck:nth-of-type(4)').checked
+        }
+      };
+    }
+    
+    function downloadWorksheetJSON(){
+      try{
+        const data = makeWorksheetJSON();
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sloth-moth-worksheet-${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        playSoftTone('success');
+        showToast('JSON downloaded ✅');
+      }catch(e){
+        console.error('JSON download failed:', e);
+        showToast('Download failed ❌');
+      }
+    }
+    
+    function requestPDF(){
+      try{
+        const finalText = $('#finalText');
+        const wordCount$ = wordCount(finalText.value);
+        const allChecks = $$('.selfcheck').every(c => c.checked);
+        const hasMinWords = wordCount$ >= 120;
+        
+        if(xp < 100 || !hasMinWords || !allChecks){
+          showToast('PDF unlock requirements not met ❌');
+          return;
+        }
+        
+        // Create PDF content
+        const checks = $$('.selfcheck').map((c,i) => `${c.checked ? '✅' : '⬜'} ${['Used 5+ vocab words', 'Explained 2+ benefits', 'Used careful language', 'Wrote 2+ research facts'][i]}`).join('\n');
+        const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Sloth, Moth & Algae – Final Worksheet</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 40px; line-height: 1.6; color: #17352a; }
+    h1 { color: #10291f; margin-bottom: 10px; }
+    .timestamp { color: #5f766d; font-size: 0.9em; margin-bottom: 20px; }
+    .section { margin: 20px 0; padding: 15px; border-left: 4px solid #6fcf7d; background: #f6fff5; }
+    .section h2 { color: #1e6046; margin-top: 0; }
+    .checks { background: #fffdf7; padding: 10px; border-radius: 8px; font-family: monospace; white-space: pre-wrap; }
+    .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #d8e9dd; font-size: 0.9em; color: #5f766d; }
+  </style>
+</head>
+<body>
+  <h1>🦥 Sloth, Moth & Algae – Final Worksheet</h1>
+  <p class="timestamp">Generated: ${new Date().toLocaleString()}</p>
+  
+  <div class="section">
+    <h2>Prediction</h2>
+    <p>${$('#predictionBox').value.trim() || '(not filled)'}</p>
+  </div>
+  
+  <div class="section">
+    <h2>Three Surprising Things</h2>
+    <p>${$('#surpriseBox').value.trim() || '(not filled)'}</p>
+  </div>
+  
+  <div class="section">
+    <h2>Evidence Reflection</h2>
+    <p>${$('#evidenceBox').value.trim() || '(not filled)'}</p>
+  </div>
+  
+  <div class="section">
+    <h2>Research Findings</h2>
+    <p><strong>Fact 1:</strong> ${$('#fact1').value.trim() || '(not filled)'}</p>
+    <p><strong>Source:</strong> ${$('#source1').value.trim() || '(not filled)'}</p>
+    <p style="margin-top: 15px;"><strong>Fact 2:</strong> ${$('#fact2').value.trim() || '(not filled)'}</p>
+    <p><strong>Source:</strong> ${$('#source2').value.trim() || '(not filled)'}</p>
+  </div>
+  
+  <div class="section">
+    <h2>Final Explanation (${wordCount$} words)</h2>
+    <p>${$('#finalText').value.trim()}</p>
+  </div>
+  
+  <div class="section">
+    <h2>Self-Check Results</h2>
+    <div class="checks">${checks}</div>
+  </div>
+  
+  <div class="footer">
+    <p>🎮 Total XP earned: ${xp}</p>
+    <p>✅ All requirements met. Final boss defeated! 🏆</p>
+  </div>
+</body>
+</html>
+        `;
+        
+        // Create and trigger PDF download
+        const blob = new Blob([htmlContent], {type: 'text/html'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sloth-moth-final-${Date.now()}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        playSoftTone('success');
+        showToast('PDF downloaded ✅');
+        burstConfetti(window.innerWidth/2, window.innerHeight/2, 50);
+        showReaction('Final boss defeated! 🏆', window.innerWidth/2, window.innerHeight/2);
+      }catch(e){
+        console.error('PDF generation failed:', e);
+        showToast('PDF generation failed ❌');
+      }
+    }
+    
     function makeCopyText(){
       const checks = $$('.selfcheck').map((c,i) => `${c.checked ? '✅' : '⬜'} Self-check ${i+1}`).join('\n');
       const text = `Sloth, Moth & Algae – Worksheet answers\n\nPrediction:\n${$('#predictionBox').value.trim()}\n\nSurprising things:\n${$('#surpriseBox').value.trim()}\n\nEvidence reflection:\n${$('#evidenceBox').value.trim()}\n\nResearch fact 1:\n${$('#fact1').value.trim()}\nSource: ${$('#source1').value.trim()}\n\nResearch fact 2:\n${$('#fact2').value.trim()}\nSource: ${$('#source2').value.trim()}\n\nFinal explanation:\n${$('#finalText').value.trim()}\n\n${checks}`;
