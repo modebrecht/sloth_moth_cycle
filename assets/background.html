@@ -61,7 +61,6 @@
         radial-gradient(circle at 33% 26%, rgba(130, 231, 163, .18) 0 4%, transparent 22%),
         radial-gradient(circle at 61% 36%, rgba(32, 126, 90, .12) 0 5%, transparent 28%),
         radial-gradient(circle at 80% 15%, rgba(70, 180, 109, .08) 0 7%, transparent 26%);
-      animation: mistDrift 18s ease-in-out infinite alternate;
     }
 
     .jungle-bg::after {
@@ -84,7 +83,6 @@
 
     .left-foliage {
       transform-origin: 12% 72%;
-      animation: leftBreath 9s ease-in-out infinite;
     }
 
     .right-vine {
@@ -97,7 +95,6 @@
     .leaf-sway-c { transform-origin: 84% 73%; animation: leafSwayA 7s ease-in-out infinite reverse; }
 
     .glow-dot {
-      filter: url(#glow);
       transform-box: fill-box;
       transform-origin: center;
       animation: fireflyPulse 3.6s ease-in-out infinite;
@@ -106,7 +103,6 @@
     .glow-dot:nth-of-type(3n) { animation-delay: -2.1s; }
 
     .firefly {
-      filter: url(#glowStrong);
       transform-box: fill-box;
       transform-origin: center;
       animation: fireflyFloat 10s ease-in-out infinite, fireflyPulse 2.7s ease-in-out infinite;
@@ -217,6 +213,12 @@
           </feMerge>
         </filter>
 
+        <radialGradient id="fireflyGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+          <stop offset="25%" stop-color="#ffd35b" stop-opacity="0.8" />
+          <stop offset="100%" stop-color="#ffd35b" stop-opacity="0" />
+        </radialGradient>
+
         <path id="leafShape" d="M0,68 C56,-12 164,-20 244,50 C158,77 90,135 14,148 C2,118 -6,91 0,68Z" />
         <path id="smallLeaf" d="M3,47 C44,-7 116,-11 168,39 C107,57 68,98 9,105 C-2,82 -3,63 3,47Z" />
       </defs>
@@ -238,20 +240,20 @@
       </g>
 
       <g class="mid-layer">
-        <circle class="glow-dot" cx="354" cy="315" r="3.2" fill="#e7ff99" opacity=".55" />
-        <circle class="glow-dot" cx="579" cy="336" r="6.2" fill="#dfff91" opacity=".48" />
-        <circle class="glow-dot" cx="597" cy="481" r="2.6" fill="#dfff91" opacity=".45" />
-        <circle class="glow-dot" cx="1028" cy="169" r="4" fill="#eaff9c" opacity=".62" />
-        <circle class="glow-dot" cx="1069" cy="752" r="3" fill="#eaff9c" opacity=".48" />
-        <circle class="glow-dot" cx="1196" cy="908" r="5" fill="#eaff9c" opacity=".62" />
-        <circle class="glow-dot" cx="1364" cy="359" r="3.6" fill="#eaff9c" opacity=".5" />
-        <circle class="glow-dot" cx="1410" cy="572" r="5" fill="#eaff9c" opacity=".56" />
-        <circle class="glow-dot" cx="622" cy="817" r="6.5" fill="#eaff9c" opacity=".54" />
-        <circle class="firefly f1" cx="1460" cy="940" r="7" fill="#dcff83" opacity=".56" />
-        <circle class="firefly f2" cx="728" cy="874" r="5" fill="#e8ff9c" opacity=".44" />
-        <circle class="firefly f3" cx="1542" cy="732" r="4" fill="#e8ff9c" opacity=".48" />
-        <circle class="firefly f4" cx="212" cy="806" r="4" fill="#e8ff9c" opacity=".37" />
-        <circle class="firefly f5" cx="1291" cy="255" r="3.6" fill="#e8ff9c" opacity=".48" />
+        <circle class="glow-dot" cx="354" cy="315" r="10" fill="url(#fireflyGlow)" opacity=".55" />
+        <circle class="glow-dot" cx="579" cy="336" r="18" fill="url(#fireflyGlow)" opacity=".48" />
+        <circle class="glow-dot" cx="597" cy="481" r="8" fill="url(#fireflyGlow)" opacity=".45" />
+        <circle class="glow-dot" cx="1028" cy="169" r="12" fill="url(#fireflyGlow)" opacity=".62" />
+        <circle class="glow-dot" cx="1069" cy="752" r="9" fill="url(#fireflyGlow)" opacity=".48" />
+        <circle class="glow-dot" cx="1196" cy="908" r="15" fill="url(#fireflyGlow)" opacity=".62" />
+        <circle class="glow-dot" cx="1364" cy="359" r="11" fill="url(#fireflyGlow)" opacity=".5" />
+        <circle class="glow-dot" cx="1410" cy="572" r="15" fill="url(#fireflyGlow)" opacity=".56" />
+        <circle class="glow-dot" cx="622" cy="817" r="20" fill="url(#fireflyGlow)" opacity=".54" />
+        <circle class="firefly f1" cx="1460" cy="940" r="24" fill="url(#fireflyGlow)" opacity=".56" />
+        <circle class="firefly f2" cx="728" cy="874" r="17" fill="url(#fireflyGlow)" opacity=".44" />
+        <circle class="firefly f3" cx="1542" cy="732" r="14" fill="url(#fireflyGlow)" opacity=".48" />
+        <circle class="firefly f4" cx="212" cy="806" r="14" fill="url(#fireflyGlow)" opacity=".37" />
+        <circle class="firefly f5" cx="1291" cy="255" r="11" fill="url(#fireflyGlow)" opacity=".48" />
       </g>
 
       <g class="front-layer right-vine">
