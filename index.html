@@ -1919,6 +1919,8 @@
       body:not(.print-view) .slide{
         padding:20px 14px!important;
         border-radius:20px!important;
+        touch-action:pan-y!important;
+        overscroll-behavior-y:contain!important;
       }
     }
 </style>
@@ -2530,7 +2532,7 @@
 <div aria-label="slide navigation" class="dots" id="dots"></div>
 <button id="nextBtn" onclick="nextSlide()">Next →</button>
 <button aria-controls="visualOptions" aria-expanded="false" class="plain" id="visualOptionsBtn" onclick="toggleVisualOptions()" title="Visual options" type="button">⚙️</button>
-<div class="footer-note">← → · swipe · double tap images 💚</div>
+<div class="footer-note">← → · scroll inside slide · double tap images 💚</div>
 </div>
 <div class="visual-options" hidden id="visualOptions">
 <div class="visual-options-header"><strong>Visual options</strong><button class="visual-options-reset" id="resetVisualOptions" type="button">Reset defaults</button></div>
@@ -2977,15 +2979,7 @@
           }
         });
       });
-      let touchStartY = null;
-      document.addEventListener('touchstart', e => { touchStartY = e.changedTouches[0].clientY; }, {passive:true});
-      document.addEventListener('touchend', e => {
-        if(printView || touchStartY === null) return;
-        const dy = e.changedTouches[0].clientY - touchStartY;
-        if(Math.abs(dy) > 60){ dy < 0 ? nextSlide() : prevSlide(); }
-        touchStartY = null;
-      }, {passive:true});
-      showToast('Swipe controls ready ✨');
+      showToast('Slide controls ready ✨');
     }
 
 
@@ -3154,14 +3148,6 @@
           }
         });
       });
-      let touchStartY = null;
-      document.addEventListener('touchstart', e => { touchStartY = e.changedTouches[0].clientY; }, {passive:true});
-      document.addEventListener('touchend', e => {
-        if(printView || touchStartY === null) return;
-        const dy = e.changedTouches[0].clientY - touchStartY;
-        if(Math.abs(dy) > 60){ dy < 0 ? nextSlide() : prevSlide(); }
-        touchStartY = null;
-      }, {passive:true});
       showToast('XP unlocks ready ✨');
     }
 
