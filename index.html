@@ -1889,7 +1889,7 @@
     .video-launch small{color:#d9ffdf;font-weight:700;}
     .video-fallback{margin:10px 2px 0;font-size:.86rem;color:var(--muted);}
     .sloth-card{display:flex;flex-direction:column;gap:10px;margin:0;}
-    .sloth-embed{width:100%;min-height:300px;flex:1;border:0;border-radius:17px;background:#edf7ea;}
+    .sloth-embed{display:grid;place-items:center;position:relative;overflow:hidden;width:100%;min-height:300px;flex:1;border:0;border-radius:17px;background:#edf7ea;}
     .watch-prompts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px;}
     .watch-prompts .info-card{padding:14px 16px;}
     @media(max-width:760px){
@@ -1947,7 +1947,50 @@
     }
 
     /* Reusable animated jungle from assets/background.html */
-    .jungle-background-layer{position:fixed;inset:0;z-index:0;width:100%;height:100%;border:0;pointer-events:none;opacity:.4;transition:opacity .25s ease;}
+    .jungle-background-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      pointer-events: none;
+      opacity: .4;
+      transition: opacity .25s ease;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 40% 18%, rgba(115, 218, 153, .33) 0 6%, rgba(75, 176, 126, .20) 12%, transparent 38%),
+        radial-gradient(circle at 73% 64%, rgba(29, 128, 85, .25) 0 10%, transparent 34%),
+        radial-gradient(circle at 18% 78%, rgba(21, 99, 62, .33) 0 8%, transparent 34%),
+        linear-gradient(135deg, #176448 0%, #083325 35%, #031711 100%);
+      filter: saturate(1.08) contrast(1.04);
+    }
+    .jungle-background-layer::before,
+    .jungle-background-layer::after {
+      content: "";
+      position: absolute;
+      inset: -18%;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+    .jungle-background-layer::before {
+      background:
+        radial-gradient(circle at 33% 26%, rgba(130, 231, 163, .18) 0 4%, transparent 22%),
+        radial-gradient(circle at 61% 36%, rgba(32, 126, 90, .12) 0 5%, transparent 28%),
+        radial-gradient(circle at 80% 15%, rgba(70, 180, 109, .08) 0 7%, transparent 26%);
+    }
+    .jungle-background-layer::after {
+      background:
+        radial-gradient(circle at 50% 50%, transparent 0 45%, rgba(0, 0, 0, .42) 76%, rgba(0, 0, 0, .68) 100%);
+      mix-blend-mode: multiply;
+    }
+    .jungle-background-layer svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
     body:not(.print-view) .app{position:relative;z-index:1;}
     body:not(.print-view) .slide{background:rgba(255,253,247,var(--slide-surface-opacity,.75))!important;}
     .visual-options{position:fixed;right:max(12px,calc((100vw - 1220px)/2 + 12px));bottom:64px;z-index:160;width:min(290px,calc(100vw - 24px));padding:16px;border-radius:18px;background:rgba(18,50,38,.94);border:1px solid rgba(255,255,255,.28);box-shadow:0 18px 44px rgba(0,0,0,.28);backdrop-filter:blur(20px);color:white;}
@@ -2028,7 +2071,153 @@
 </style>
 </head>
 <body>
-<iframe aria-hidden="true" class="jungle-background-layer" id="jungleBackground" src="assets/background.html" tabindex="-1" title=""></iframe>
+<div aria-hidden="true" class="jungle-background-layer" id="jungleBackground">
+  <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <style>
+        .jungle-background-layer svg .soft-layer { filter: url(#softBlur); opacity: .58; }
+        .jungle-background-layer svg .mid-layer { opacity: .72; }
+        .jungle-background-layer svg .front-layer { opacity: .96; }
+        .jungle-background-layer svg .left-foliage { transform-origin: 12% 72%; }
+        .jungle-background-layer svg .right-vine { transform-origin: 86% 0%; animation: vineSway 7.5s ease-in-out infinite; }
+        .jungle-background-layer svg .leaf-sway-a { transform-origin: 88% 48%; animation: leafSwayA 5.8s ease-in-out infinite; }
+        .jungle-background-layer svg .leaf-sway-b { transform-origin: 87% 61%; animation: leafSwayB 6.4s ease-in-out infinite; }
+        .jungle-background-layer svg .leaf-sway-c { transform-origin: 84% 73%; animation: leafSwayA 7s ease-in-out infinite reverse; }
+        .jungle-background-layer svg .glow-dot { transform-box: fill-box; transform-origin: center; animation: fireflyPulse 3.6s ease-in-out infinite; }
+        .jungle-background-layer svg .glow-dot:nth-of-type(2n) { animation-delay: -1.2s; }
+        .jungle-background-layer svg .glow-dot:nth-of-type(3n) { animation-delay: -2.1s; }
+        .jungle-background-layer svg .firefly { transform-box: fill-box; transform-origin: center; animation: fireflyFloat 10s ease-in-out infinite, fireflyPulse 2.7s ease-in-out infinite; }
+        .jungle-background-layer svg .firefly.f2 { animation-delay: -2s, -.6s; }
+        .jungle-background-layer svg .firefly.f3 { animation-delay: -4s, -1.4s; }
+        .jungle-background-layer svg .firefly.f4 { animation-delay: -6s, -.9s; }
+        .jungle-background-layer svg .firefly.f5 { animation-delay: -8s, -1.8s; }
+
+        @keyframes vineSway {
+          0%, 100% { transform: rotate(.4deg) translateX(0); }
+          50%      { transform: rotate(-1.5deg) translateX(-8px); }
+        }
+        @keyframes leafSwayA {
+          0%, 100% { transform: rotate(0deg) translateY(0); }
+          50%      { transform: rotate(2.5deg) translateY(-4px); }
+        }
+        @keyframes leafSwayB {
+          0%, 100% { transform: rotate(0deg) translateY(0); }
+          50%      { transform: rotate(-2deg) translateY(3px); }
+        }
+        @keyframes fireflyPulse {
+          0%, 100% { opacity: .25; transform: scale(.75); }
+          50%      { opacity: 1; transform: scale(1.22); }
+        }
+        @keyframes fireflyFloat {
+          0%, 100% { translate: 0 0; }
+          25%      { translate: 10px -16px; }
+          50%      { translate: -7px -26px; }
+          75%      { translate: 13px -10px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .jungle-background-layer svg *, .jungle-background-layer svg *::before, .jungle-background-layer svg *::after { animation: none !important; }
+        }
+      </style>
+
+      <radialGradient id="centerBloom" cx="43%" cy="19%" r="68%">
+        <stop offset="0" stop-color="#83e5a5" stop-opacity="0.30" />
+        <stop offset="0.28" stop-color="#2f9b6a" stop-opacity="0.18" />
+        <stop offset="0.72" stop-color="#05241a" stop-opacity="0.04" />
+        <stop offset="1" stop-color="#010907" stop-opacity="0.56" />
+      </radialGradient>
+
+      <linearGradient id="leafA" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#23a968" stop-opacity="0.72" />
+        <stop offset="0.52" stop-color="#0b673d" stop-opacity="0.56" />
+        <stop offset="1" stop-color="#052619" stop-opacity="0.36" />
+      </linearGradient>
+
+      <linearGradient id="leafB" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#179b5b" stop-opacity="0.96" />
+        <stop offset="0.62" stop-color="#0a5b34" stop-opacity="0.88" />
+        <stop offset="1" stop-color="#042319" stop-opacity="0.78" />
+      </linearGradient>
+
+      <linearGradient id="vineGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#28cf7a" stop-opacity="0.88" />
+        <stop offset="0.45" stop-color="#19a965" stop-opacity="0.82" />
+        <stop offset="1" stop-color="#12864f" stop-opacity="0.75" />
+      </linearGradient>
+
+      <filter id="softBlur" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="9" />
+      </filter>
+
+      <radialGradient id="fireflyGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+        <stop offset="25%" stop-color="#ffd35b" stop-opacity="0.8" />
+        <stop offset="100%" stop-color="#ffd35b" stop-opacity="0" />
+      </radialGradient>
+
+      <path id="leafShape" d="M0,68 C56,-12 164,-20 244,50 C158,77 90,135 14,148 C2,118 -6,91 0,68Z" />
+      <path id="smallLeaf" d="M3,47 C44,-7 116,-11 168,39 C107,57 68,98 9,105 C-2,82 -3,63 3,47Z" />
+    </defs>
+
+    <rect width="1920" height="1080" fill="url(#centerBloom)" />
+
+    <g class="soft-layer left-foliage">
+      <use href="#leafShape" x="-56" y="86" transform="scale(1.42) rotate(-9 80 150)" fill="url(#leafA)" />
+      <use href="#leafShape" x="122" y="360" transform="scale(1.58) rotate(-12 210 480)" fill="url(#leafA)" opacity=".8" />
+      <use href="#leafShape" x="28" y="668" transform="scale(1.34) rotate(-7 190 740)" fill="url(#leafA)" opacity=".72" />
+      <use href="#leafShape" x="478" y="714" transform="scale(1.7) rotate(-17 560 810)" fill="url(#leafA)" opacity=".45" />
+      <path d="M48 639 C156 537 198 372 180 163" fill="none" stroke="#3ec887" stroke-width="13" stroke-linecap="round" opacity=".12" />
+      <path d="M126 874 C184 758 300 710 472 695" fill="none" stroke="#50e196" stroke-width="10" stroke-linecap="round" opacity=".07" />
+    </g>
+
+    <g class="soft-layer" opacity=".42">
+      <use href="#leafShape" x="705" y="742" transform="scale(1.86) rotate(-4 840 820)" fill="url(#leafA)" />
+      <use href="#leafShape" x="1296" y="635" transform="scale(1.48) rotate(7 1430 760)" fill="url(#leafA)" opacity=".32" />
+    </g>
+
+    <g class="mid-layer">
+      <circle class="glow-dot" cx="354" cy="315" r="10" fill="url(#fireflyGlow)" opacity=".55" />
+      <circle class="glow-dot" cx="579" cy="336" r="18" fill="url(#fireflyGlow)" opacity=".48" />
+      <circle class="glow-dot" cx="597" cy="481" r="8" fill="url(#fireflyGlow)" opacity=".45" />
+      <circle class="glow-dot" cx="1028" cy="169" r="12" fill="url(#fireflyGlow)" opacity=".62" />
+      <circle class="glow-dot" cx="1069" cy="752" r="9" fill="url(#fireflyGlow)" opacity=".48" />
+      <circle class="glow-dot" cx="1196" cy="908" r="15" fill="url(#fireflyGlow)" opacity=".62" />
+      <circle class="glow-dot" cx="1364" cy="359" r="11" fill="url(#fireflyGlow)" opacity=".5" />
+      <circle class="glow-dot" cx="1410" cy="572" r="15" fill="url(#fireflyGlow)" opacity=".56" />
+      <circle class="glow-dot" cx="622" cy="817" r="20" fill="url(#fireflyGlow)" opacity=".54" />
+      <circle class="firefly f1" cx="1460" cy="940" r="24" fill="url(#fireflyGlow)" opacity=".56" />
+      <circle class="firefly f2" cx="728" cy="874" r="17" fill="url(#fireflyGlow)" opacity=".44" />
+      <circle class="firefly f3" cx="1542" cy="732" r="14" fill="url(#fireflyGlow)" opacity=".48" />
+      <circle class="firefly f4" cx="212" cy="806" r="14" fill="url(#fireflyGlow)" opacity=".37" />
+      <circle class="firefly f5" cx="1291" cy="255" r="11" fill="url(#fireflyGlow)" opacity=".48" />
+    </g>
+
+    <g class="front-layer right-vine">
+      <path d="M1698 -48 C1690 167 1675 331 1684 505 C1692 670 1664 819 1730 962" fill="none" stroke="url(#vineGrad)" stroke-width="13" stroke-linecap="round" opacity=".9" />
+      <path d="M1697 -35 C1687 144 1680 308 1687 509 C1692 660 1669 810 1722 943" fill="none" stroke="#74ffad" stroke-width="3" stroke-linecap="round" opacity=".26" />
+
+      <g class="leaf-sway-a">
+        <use href="#leafShape" x="1484" y="122" transform="scale(1.5) rotate(8 1605 230)" fill="url(#leafB)" />
+        <path d="M1565 333 C1637 274 1714 239 1848 246" fill="none" stroke="#041a12" stroke-width="11" stroke-linecap="round" opacity=".25" />
+      </g>
+
+      <g class="leaf-sway-b">
+        <use href="#leafShape" x="1454" y="383" transform="scale(1.43) rotate(-8 1570 510)" fill="url(#leafB)" opacity=".92" />
+        <use href="#smallLeaf" x="1630" y="326" transform="scale(1.1) rotate(10 1690 390)" fill="url(#leafB)" opacity=".82" />
+      </g>
+
+      <g class="leaf-sway-c">
+        <use href="#smallLeaf" x="1470" y="700" transform="scale(1.34) rotate(-8 1530 770)" fill="#21bf73" opacity=".95" />
+        <path d="M1494 804 C1556 762 1600 741 1681 733" fill="none" stroke="#052417" stroke-width="7" stroke-linecap="round" opacity=".25" />
+        <use href="#smallLeaf" x="1693" y="671" transform="scale(1.2) rotate(-12 1760 760)" fill="url(#leafB)" opacity=".86" />
+      </g>
+    </g>
+
+    <g opacity=".24" filter="url(#softBlur)">
+      <ellipse cx="165" cy="1010" rx="260" ry="82" fill="#00100b" />
+      <ellipse cx="1770" cy="1000" rx="300" ry="95" fill="#000d09" />
+    </g>
+  </svg>
+</div>
 <div aria-hidden="true" class="fx-layer" id="fxLayer"></div>
 <div aria-hidden="true" class="juice-hud">
 <div class="juice-chip">⚡ XP <strong id="xpValue">0</strong></div>
@@ -2285,7 +2474,283 @@
 </script>
 </div>
 <figure class="sloth-card">
-<iframe class="sloth-embed" loading="lazy" src="assets/hang.html" title="Animated sloth hanging from a branch"></iframe>
+<div class="sloth-embed" aria-label="Animated premium sloth">
+  <div class="sloth-premium-v2" style="position:relative;left:auto;top:auto;width:min(100%, 360px);margin:auto;">
+    <svg viewBox="0 0 520 430" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;overflow:visible;">
+      <defs>
+        <radialGradient id="ps2Fur" cx="38%" cy="25%" r="80%">
+          <stop offset="0%" stop-color="#c99767"/>
+          <stop offset="55%" stop-color="#a36d43"/>
+          <stop offset="100%" stop-color="#6e4329"/>
+        </radialGradient>
+
+        <radialGradient id="ps2DarkFur" cx="35%" cy="20%" r="85%">
+          <stop offset="0%" stop-color="#8a5635"/>
+          <stop offset="100%" stop-color="#4b2b1b"/>
+        </radialGradient>
+
+        <linearGradient id="ps2Face" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#fff3cf"/>
+          <stop offset="65%" stop-color="#efd09e"/>
+          <stop offset="100%" stop-color="#d8aa72"/>
+        </linearGradient>
+
+        <linearGradient id="ps2Branch" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#5b321d"/>
+          <stop offset="45%" stop-color="#8b5631"/>
+          <stop offset="100%" stop-color="#5a311b"/>
+        </linearGradient>
+
+        <linearGradient id="ps2Leaf" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#9cc64d"/>
+          <stop offset="100%" stop-color="#3e752f"/>
+        </linearGradient>
+
+        <filter id="ps2Shadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#000" flood-opacity="0.22"/>
+        </filter>
+      </defs>
+
+      <!-- leaves behind branch -->
+      <g class="ps2-leaves">
+        <path d="M104 86 C82 57, 82 30, 95 13 C126 34, 130 64, 104 86Z" fill="url(#ps2Leaf)"/>
+        <path d="M122 96 C145 69, 171 60, 192 69 C178 105, 148 116, 122 96Z" fill="url(#ps2Leaf)"/>
+        <path d="M408 74 C390 43, 397 19, 416 8 C440 34, 436 62, 408 74Z" fill="url(#ps2Leaf)"/>
+        <path d="M424 90 C452 69, 477 67, 493 82 C470 113, 442 115, 424 90Z" fill="url(#ps2Leaf)"/>
+      </g>
+
+      <!-- branch -->
+      <g filter="url(#ps2Shadow)">
+        <path d="M42 118 C132 104, 262 116, 482 100"
+              fill="none"
+              stroke="url(#ps2Branch)"
+              stroke-width="34"
+              stroke-linecap="round"/>
+
+        <path d="M96 113 C136 92, 159 67, 177 32"
+              fill="none"
+              stroke="#714321"
+              stroke-width="16"
+              stroke-linecap="round"/>
+
+        <path d="M350 106 C388 82, 410 54, 421 23"
+              fill="none"
+              stroke="#714321"
+              stroke-width="16"
+              stroke-linecap="round"/>
+
+        <path d="M96 109 C192 101, 324 107, 443 96"
+              fill="none"
+              stroke="#a96d3e"
+              stroke-width="5"
+              stroke-linecap="round"
+              opacity="0.45"/>
+      </g>
+
+      <!-- whole sloth hanging from branch -->
+      <g class="ps2-sloth" filter="url(#ps2Shadow)">
+        <!-- arms behind branch -->
+        <path class="ps2-arm-left"
+              d="M178 114 C142 140, 121 189, 131 238 C137 270, 156 291, 181 294 C160 241, 170 181, 214 132Z"
+              fill="url(#ps2Fur)"/>
+
+        <path class="ps2-arm-right"
+              d="M342 108 C382 135, 403 187, 392 239 C385 273, 364 293, 338 294 C361 238, 351 176, 305 128Z"
+              fill="url(#ps2Fur)"/>
+
+        <!-- gripping claws on top of branch -->
+        <g class="ps2-claws">
+          <path d="M175 95 C168 110, 164 128, 165 144" />
+          <path d="M193 94 C188 111, 186 129, 189 146" />
+          <path d="M211 97 C208 113, 209 130, 215 145" />
+
+          <path d="M309 94 C302 111, 299 129, 301 146" />
+          <path d="M327 93 C323 111, 323 129, 328 146" />
+          <path d="M345 96 C344 113, 347 130, 354 145" />
+        </g>
+
+        <!-- body -->
+        <g class="ps2-body">
+          <path d="M179 205
+                   C185 152, 223 124, 266 127
+                   C316 130, 353 170, 359 226
+                   C367 305, 327 374, 263 381
+                   C199 388, 158 321, 179 205Z"
+                fill="url(#ps2Fur)"/>
+
+          <path d="M216 223
+                   C230 198, 286 193, 312 226
+                   C339 260, 319 330, 267 341
+                   C217 333, 194 266, 216 223Z"
+                fill="#c79562"
+                opacity="0.32"/>
+
+          <!-- belly fur strokes -->
+          <g opacity="0.24" fill="none" stroke="#f1c38b" stroke-width="4" stroke-linecap="round">
+            <path d="M226 248 C245 235, 272 233, 294 244"/>
+            <path d="M215 286 C237 303, 277 306, 306 287"/>
+            <path d="M235 335 C260 345, 291 335, 307 312"/>
+          </g>
+        </g>
+
+        <!-- head -->
+        <g class="ps2-head">
+          <path d="M164 191
+                   C156 129, 196 82, 257 80
+                   C319 78, 361 126, 354 190
+                   C348 245, 307 281, 258 282
+                   C207 283, 171 246, 164 191Z"
+                fill="url(#ps2DarkFur)"/>
+
+          <!-- top hair -->
+          <path d="M221 88 C230 61, 252 58, 260 82 C274 58, 299 64, 299 91 C274 80, 245 80, 221 88Z"
+                fill="#8a5635"/>
+
+          <!-- cream face mask -->
+          <path d="M184 184
+                   C181 139, 208 107, 241 128
+                   C249 134, 253 143, 258 152
+                   C263 142, 269 133, 279 127
+                   C312 108, 339 140, 334 185
+                   C329 230, 298 258, 259 259
+                   C218 259, 188 230, 184 184Z"
+                fill="url(#ps2Face)"/>
+
+          <!-- dark eye patches -->
+          <path d="M199 181
+                   C202 148, 224 132, 248 138
+                   C244 174, 225 198, 199 203Z"
+                fill="#5a3420"/>
+
+          <path d="M316 181
+                   C313 148, 291 132, 267 138
+                   C271 174, 290 198, 316 203Z"
+                fill="#5a3420"/>
+
+          <!-- eyes -->
+          <g class="ps2-eyes">
+            <circle cx="228" cy="175" r="16" fill="#201511"/>
+            <circle cx="288" cy="175" r="16" fill="#201511"/>
+            <circle cx="233" cy="168" r="5.5" fill="#fff"/>
+            <circle cx="293" cy="168" r="5.5" fill="#fff"/>
+          </g>
+
+          <!-- nose -->
+          <path d="M240 199
+                   C247 188, 268 188, 276 199
+                   C273 214, 264 221, 258 221
+                   C251 221, 243 214, 240 199Z"
+                fill="#3a2823"/>
+
+          <ellipse cx="250" cy="202" rx="4.5" ry="3" fill="#18100e" opacity="0.75"/>
+          <ellipse cx="267" cy="202" rx="4.5" ry="3" fill="#18100e" opacity="0.75"/>
+
+          <!-- smile -->
+          <path d="M225 224 C239 242, 278 242, 293 224"
+                fill="none"
+                stroke="#3b2a22"
+                stroke-width="5"
+                stroke-linecap="round"/>
+        </g>
+
+        <!-- feet / lower claws -->
+        <g class="ps2-feet">
+          <path d="M202 346 C181 367, 156 371, 136 354" fill="none" stroke="#8a5635" stroke-width="28" stroke-linecap="round"/>
+          <path d="M314 346 C337 367, 362 371, 383 354" fill="none" stroke="#8a5635" stroke-width="28" stroke-linecap="round"/>
+
+          <g class="ps2-foot-claws">
+            <path d="M137 354 C124 362, 113 365, 101 364"/>
+            <path d="M151 364 C140 376, 130 383, 118 386"/>
+            <path d="M166 367 C160 381, 153 391, 142 397"/>
+
+            <path d="M381 354 C394 362, 405 365, 417 364"/>
+            <path d="M367 364 C378 376, 388 383, 400 386"/>
+            <path d="M352 367 C358 381, 365 391, 376 397"/>
+          </g>
+        </g>
+      </g>
+    </svg>
+  </div>
+  <style>
+    .sloth-premium-v2 {
+      z-index: 35;
+      pointer-events: none;
+      animation: ps2Float 5.5s ease-in-out infinite;
+      transform-origin: 50% 20%;
+    }
+    .ps2-sloth {
+      animation: ps2HangSway 6.2s ease-in-out infinite;
+      transform-origin: 260px 110px;
+    }
+    .ps2-head {
+      animation: ps2Head 5.4s ease-in-out infinite;
+      transform-origin: 258px 205px;
+    }
+    .ps2-body {
+      animation: ps2Breath 4.8s ease-in-out infinite;
+      transform-origin: 260px 260px;
+    }
+    .ps2-arm-left {
+      animation: ps2ArmLeft 5.7s ease-in-out infinite;
+      transform-origin: 190px 112px;
+    }
+    .ps2-arm-right {
+      animation: ps2ArmRight 6.1s ease-in-out infinite;
+      transform-origin: 330px 108px;
+    }
+    .ps2-leaves {
+      animation: ps2Leaves 4.4s ease-in-out infinite;
+      transform-origin: 260px 100px;
+    }
+    .ps2-eyes {
+      animation: ps2Blink 6.4s infinite;
+      transform-origin: 258px 175px;
+    }
+    .ps2-claws path,
+    .ps2-foot-claws path {
+      fill: none;
+      stroke: #fff0cf;
+      stroke-width: 10;
+      stroke-linecap: round;
+    }
+    .ps2-foot-claws path {
+      stroke-width: 8;
+    }
+    @keyframes ps2Float {
+      0%, 100% { transform: translateY(0) rotate(-0.8deg); }
+      50% { transform: translateY(-8px) rotate(0.9deg); }
+    }
+    @keyframes ps2HangSway {
+      0%, 100% { transform: rotate(-1.5deg); }
+      50% { transform: rotate(1.5deg); }
+    }
+    @keyframes ps2Head {
+      0%, 100% { transform: rotate(2deg); }
+      50% { transform: rotate(-2.4deg); }
+    }
+    @keyframes ps2Breath {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.018); }
+    }
+    @keyframes ps2ArmLeft {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(-2deg); }
+    }
+    @keyframes ps2ArmRight {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(2deg); }
+    }
+    @keyframes ps2Leaves {
+      0%, 100% { transform: rotate(-1deg); }
+      50% { transform: rotate(1.5deg); }
+    }
+    @keyframes ps2Blink {
+      0%, 91%, 100% { transform: scaleY(1); }
+      93% { transform: scaleY(0.08); }
+      95% { transform: scaleY(1); }
+    }
+  </style>
+</div>
 <figcaption><strong>Watch closely:</strong> where does a sloth spend most of its time?</figcaption>
 </figure>
 </div>
