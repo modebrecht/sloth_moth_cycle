@@ -1736,6 +1736,12 @@
       font-size:.86rem;
     }
     .slide[data-title="Listening"] .listening-controls{margin-top:12px!important;}
+    .speed-btn.active{
+      background:linear-gradient(135deg,#ffefc8,#fff7e8);
+      border-color:#ffcc66;
+      box-shadow:0 0 0 4px rgba(255,204,102,.18),0 10px 22px rgba(122,72,21,.12);
+      color:#6b4210;
+    }
     .slide[data-title="Listening"] .life-support{
       margin-top:12px!important;
       background:#fffdf7!important;
@@ -2304,12 +2310,17 @@
 <h3>First, listen to the life cycle.</h3>
 <p class="micro-help">Click play. The browser reads the text aloud. Then answer the missing-word questions without needing a check button.</p>
 <div class="pillbox listening-controls">
+<button class="plain speed-btn" onclick="setListenRate(0.6, this)" type="button">🐌 0.6x</button>
+<button class="plain speed-btn" onclick="setListenRate(0.8, this)" type="button">🐢 0.8x</button>
+<button class="plain speed-btn active" onclick="setListenRate(1.0, this)" type="button">🎧 1.0x Normal</button>
+<button class="plain speed-btn" onclick="setListenRate(1.2, this)" type="button">⚡ 1.2x</button>
 <button onclick="playListening()" type="button">▶️ Play listening</button>
 <button class="secondary" onclick="stopListening()" type="button">⏹ Stop</button>
 </div>
+<p class="micro-help" id="listenRateLabel">Speed: 🎧 1.0x Normal</p>
 <details class="life-support">
 <summary>Show transcript / support text</summary>
-<p id="listeningText">A female sloth moth lives in the fur of a three-toed sloth. About once a week, the sloth climbs down from the canopy to poop at the base of a tree. This journey is risky for the sloth, because predators may be nearby. The moth leaves the fur and lays eggs in the fresh dung. The eggs hatch into larvae. The young larvae feed and grow there. When they become adult moths, they fly back into the trees and look for a sloth. In the fur, moths may add nutrients that help algae grow.</p>
+<p id="listeningText">A moth lives in the fur of a sloth. About once a week, the sloth climbs down from the trees to leave dung on the ground. This is dangerous, because other animals may attack the sloth. When the sloth is on the ground, some moths leave the fur. They lay eggs in the fresh dung. The eggs hatch into larvae. Larvae are young moths. They feed and grow in the dung. Later, the larvae become adult moths. The adult moths fly back into the trees and find a sloth. In the fur, the moths may help algae grow. Algae can make the sloth’s fur look green. This green colour may help the sloth hide in the rainforest.</p>
 </details>
 </div>
 <div class="listen-divider"><span>Step 2 · Missing words</span></div>
@@ -2323,13 +2334,13 @@
 <button class="choice-btn gap-option" data-value="moths" type="button">Moths</button>
 </div><div class="feedback"></div>
 </div>
-<div class="question gap-question" data-answer="poop" data-gap="poop">
-<strong>2) About once a week, the sloth climbs down to <span class="blank">???</span> at the base of a tree.</strong>
+<div class="question gap-question" data-answer="dung" data-gap="dung">
+<strong>2) About once a week, the sloth climbs down to leave <span class="blank">???</span> on the ground.</strong>
 <div class="choice-grid compact gap-options">
-<button class="choice-btn gap-option" data-value="swim" type="button">Swim</button>
-<button class="choice-btn gap-option" data-value="poop" type="button">Poop</button>
-<button class="choice-btn gap-option" data-value="sing" type="button">Sing</button>
-<button class="choice-btn gap-option" data-value="sleep" type="button">Sleep</button>
+<button class="choice-btn gap-option" data-value="eggs" type="button">Eggs</button>
+<button class="choice-btn gap-option" data-value="dung" type="button">Dung</button>
+<button class="choice-btn gap-option" data-value="fur" type="button">Fur</button>
+<button class="choice-btn gap-option" data-value="algae" type="button">Algae</button>
 </div><div class="feedback"></div>
 </div>
 <div class="question gap-question" data-answer="larvae" data-gap="larvae">
@@ -2368,7 +2379,7 @@
 <div class="timeline-item order-item"><select class="order-live" data-answer="4" data-step="4"><option></option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select><div>The moth lays eggs in fresh sloth dung.</div><div class="feedback"></div></div>
 <div class="timeline-item order-item"><select class="order-live" data-answer="1" data-step="1"><option></option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select><div>A female moth lives in the sloth’s fur.</div><div class="feedback"></div></div>
 <div class="timeline-item order-item"><select class="order-live" data-answer="8" data-step="8"><option></option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select><div>In the fur, moths may add nutrients that help algae grow.</div><div class="feedback"></div></div>
-<div class="timeline-item order-item"><select class="order-live" data-answer="2" data-step="2"><option></option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select><div>The sloth climbs down from the canopy to poop.</div><div class="feedback"></div></div>
+<div class="timeline-item order-item"><select class="order-live" data-answer="2" data-step="2"><option></option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select><div>The sloth climbs down from the trees to leave dung on the ground.</div><div class="feedback"></div></div>
 <div class="timeline-item order-item"><select class="order-live" data-answer="7" data-step="7"><option></option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select><div>Adult moths fly back into the trees.</div><div class="feedback"></div></div>
 <div class="timeline-item order-item"><select class="order-live" data-answer="6" data-step="6"><option></option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select><div>The larvae feed and grow in the dung.</div><div class="feedback"></div></div>
 <div class="timeline-item order-item"><select class="order-live" data-answer="3" data-step="3"><option></option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select><div>The moth leaves the sloth’s fur.</div><div class="feedback"></div></div>
@@ -2817,15 +2828,47 @@
     }
 
     let utterance;
+    let listenRate = 1.0;
+
+    function setListenRate(rate, btn){
+      listenRate = rate;
+
+      const label = $('#listenRateLabel');
+      if(label){
+        const labelText =
+          rate === 0.6 ? 'Speed: 🐌 0.6x' :
+          rate === 0.8 ? 'Speed: 🐢 0.8x' :
+          rate === 1.2 ? 'Speed: ⚡ 1.2x' :
+          'Speed: 🎧 1.0x Normal';
+
+        label.textContent = labelText;
+      }
+
+      $$('.speed-btn').forEach(button => button.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+
+      if('speechSynthesis' in window && speechSynthesis.speaking){
+        playListening();
+      }
+    }
+
     function playListening(){
       if(!('speechSynthesis' in window)){
         alert('Speech is not supported in this browser. Please read the transcript aloud.');
         return;
       }
+
       stopListening();
-      utterance = new SpeechSynthesisUtterance($('#listeningText').textContent);
+
+      const text = $('#listeningText')?.textContent?.trim();
+      if(!text) return;
+
+      utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-GB';
-      utterance.rate = 0.88;
+      utterance.rate = listenRate;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+
       speechSynthesis.speak(utterance);
     }
     function stopListening(){
