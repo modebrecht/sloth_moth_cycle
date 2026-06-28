@@ -2168,6 +2168,49 @@
         overscroll-behavior-y:contain!important;
       }
     }
+
+    .scene-panel, .slide-image-card {
+      position: relative !important;
+      overflow: hidden !important;
+    }
+    .xp-click-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 80px;
+      height: 80px;
+      z-index: 100;
+      overflow: hidden;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+    .xp-click-badge::before {
+      content: "+2 XP";
+      position: absolute;
+      top: 16px;
+      right: -26px;
+      width: 110px;
+      height: 22px;
+      background: #c83b3b;
+      color: #ffffff;
+      font-size: 0.65rem;
+      font-weight: 900;
+      line-height: 22px;
+      text-align: center;
+      transform: rotate(45deg);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      border: 1px solid #ffcccc;
+      display: block;
+      letter-spacing: 0.5px;
+    }
+    .scene-panel:hover .xp-click-badge, 
+    .slide-image-card:hover .xp-click-badge {
+      transform: scale(1.05);
+    }
+    .xp-click-badge.claimed {
+      opacity: 0;
+      transform: scale(0.5) translate(20px, -20px);
+    }
 </style>
 </head>
 <body>
@@ -3361,7 +3404,8 @@
         layout.classList.remove('split-mode');
         btn.textContent = '📖 Wortschatz-Buch öffnen';
       }
-      setTimeout(scheduleSave, 0);
+      const saveFunc = typeof scheduleSave === 'function' ? scheduleSave : window.scheduleSave;
+      if (typeof saveFunc === 'function') setTimeout(saveFunc, 0);
     }
     function checkFinalEssayVocabulary() {
       const text = (document.getElementById('finalText')?.value || '').toLowerCase();
@@ -4119,7 +4163,42 @@
       });
     }
 
-
+    function setupImageXP(){
+      const imageContainers = document.querySelectorAll('.scene-panel, .slide-image-card');
+      const claimedImages = JSON.parse(localStorage.getItem('slothMothClaimedImageXP') || '[]');
+      
+      imageContainers.forEach((container, index) => {
+        container.querySelectorAll('.xp-click-badge').forEach(b => b.remove());
+        
+        if (claimedImages.includes(index)) {
+          return;
+        }
+        
+        const badge = document.createElement('span');
+        badge.className = 'xp-click-badge';
+        container.appendChild(badge);
+        container.style.cursor = 'pointer';
+        
+        const handleClick = (e) => {
+          const currentClaimed = JSON.parse(localStorage.getItem('slothMothClaimedImageXP') || '[]');
+          if (currentClaimed.includes(index)) return;
+          
+          currentClaimed.push(index);
+          localStorage.setItem('slothMothClaimedImageXP', JSON.stringify(currentClaimed));
+          
+          badge.classList.add('claimed');
+          setTimeout(() => badge.remove(), 400);
+          
+          awardXP(2, 'Investigated Image 📸', e.clientX || window.innerWidth/2, e.clientY || window.innerHeight/2);
+          playSoftTone('success');
+          
+          const saveFunc = typeof scheduleSave === 'function' ? scheduleSave : window.scheduleSave;
+          if (typeof saveFunc === 'function') saveFunc();
+          container.removeEventListener('click', handleClick);
+        };
+        container.addEventListener('click', handleClick);
+      });
+    }
 
     function setupTikTokJuice(){
       updateJuiceHud();
@@ -4318,6 +4397,13 @@
     setupTikTokJuice();
     updateScrollSyncedImages(slides[current]);
     updateSlideUI();
+    setupImageXP();
+
+    // Temporary helper: reset claimed images once so the user can verify the new ribbon styles!
+    if (!localStorage.getItem('slothMothRibbonReset_v3')) {
+      localStorage.setItem('slothMothClaimedImageXP', '[]');
+      localStorage.setItem('slothMothRibbonReset_v3', 'true');
+    }
   </script>
 <script>
 (function(){
@@ -4444,7 +4530,6 @@
   addSoftMoths();
   try{ updateJuiceHud(); updateSlideUI(); }catch(e){}
   persistXP();
-  try{ showToast('XP saved locally · checks +2 XP ✨'); }catch(e){}
 })();
 </script>
 <script>
@@ -4779,6 +4864,7 @@
       xpKeys: (typeof XP_EARNED_KEYS !== 'undefined') ? Array.from(XP_EARNED_KEYS) : [],
       openVocabCards: Array.from(document.querySelectorAll('.vocab-card')).map(card => card.classList.contains('open')),
       selectedButtons: selectedButtonState(),
+      claimedImageXP: JSON.parse(localStorage.getItem('slothMothClaimedImageXP') || '[]'),
       form,
       quizFeedback,
       classStates
@@ -4865,6 +4951,9 @@
     if(Array.isArray(state.xpKeys) && typeof XP_EARNED_KEYS !== 'undefined'){
       state.xpKeys.forEach(key => XP_EARNED_KEYS.add(key));
     }
+    if(Array.isArray(state.claimedImageXP)){
+      localStorage.setItem('slothMothClaimedImageXP', JSON.stringify(state.claimedImageXP));
+    }
 
     const finalText = document.getElementById('finalText');
     const wordCountEl = document.getElementById('wordCount');
@@ -4894,6 +4983,7 @@
   window.saveSlothMothWorksheetState = saveState;
   window.restoreSlothMothWorksheetState = restoreState;
   window.getSlothMothWorksheetState = collectState;
+  window.scheduleSave = scheduleSave;
 
   if(typeof downloadHTMLExport === 'function' && !downloadHTMLExport.__storageWrapped){
     const oldDownloadHTMLExport = downloadHTMLExport;
