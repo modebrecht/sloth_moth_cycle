@@ -2533,6 +2533,13 @@
 </footer>
 </div>
 <script>
+    // Keep the life-cycle activities together: Watch -> Listening -> Reading -> Check.
+    const listeningSlide = document.querySelector('.slide[data-title="Listening"]');
+    const readingSlideForOrder = document.querySelector('.slide[data-title="Reading"]');
+    if(listeningSlide && readingSlideForOrder){
+      readingSlideForOrder.before(listeningSlide);
+    }
+
     const slides = Array.from(document.querySelectorAll('.slide'));
     const dots = document.getElementById('dots');
     let current = 0;
