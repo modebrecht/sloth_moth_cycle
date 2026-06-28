@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="favicon.ico" rel="icon" type="image/x-icon"/>
-<title>The Sloth, the Moth &amp; the Algae | v3 fixed</title>
+<title>The Sloth, the Moth &amp; the Algae | HTML Export</title>
 <style>
     :root{
       --bg1:#10291f;
@@ -2064,7 +2064,6 @@
 </div>
 <div class="top-actions">
 <button class="ghost" id="viewBtn" onclick="togglePrintView()">📄 All slides</button>
-<button class="ghost export-locked" data-final-export id="headerPdfBtn" onclick="requestPDF()" disabled>🔒 PDF · 100 XP</button>
 </div>
 </div>
 </header>
@@ -2681,10 +2680,10 @@
     </figure>
   </div>
   <div class="pillbox" style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
-    <button class="secondary" id="finalPdfBtn2" onclick="requestPDF()">PDF herunterladen</button>
+    <button class="secondary" id="finalHtmlExportBtn" onclick="downloadHTMLExport()">HTML Export herunterladen</button>
     <button class="plain" id="jsonDownloadBtn2" onclick="downloadWorksheetJSON()">JSON herunterladen</button>
   </div>
-  <p class="micro-help" style="margin-top:10px;">Download your worksheet (PDF or JSON) for this activity.</p>
+  <p class="micro-help" style="margin-top:10px;">Download your worksheet as an HTML Export or JSON for this activity.</p>
 </section>
 </main>
 </div>
@@ -3091,30 +3090,31 @@
     });
     
     function makeWorksheetJSON(){
+      const selfChecks = document.querySelectorAll('.selfcheck');
       return {
         title: 'Sloth, Moth & Algae – Worksheet',
         timestamp: new Date().toISOString(),
         xp: xp,
-        prediction: $('#predictionBox').value.trim(),
-        surprises: $('#surpriseBox').value.trim(),
-        evidence: $('#evidenceBox').value.trim(),
+        prediction: $('#predictionBox')?.value?.trim() || '',
+        surprises: $('#surpriseBox')?.value?.trim() || '',
+        evidence: $('#evidenceBox')?.value?.trim() || '',
         research: [
           {
-            fact: $('#fact1').value.trim(),
-            source: $('#source1').value.trim()
+            fact: $('#fact1')?.value?.trim() || '',
+            source: $('#source1')?.value?.trim() || ''
           },
           {
-            fact: $('#fact2').value.trim(),
-            source: $('#source2').value.trim()
+            fact: $('#fact2')?.value?.trim() || '',
+            source: $('#source2')?.value?.trim() || ''
           }
         ],
-        finalExplanation: $('#finalText').value.trim(),
-        wordCount: wordCount($('#finalText').value),
+        finalExplanation: $('#finalText')?.value?.trim() || '',
+        wordCount: wordCount($('#finalText')?.value || ''),
         selfChecks: {
-          vocabularyUsed: $('#finalText').parentElement.querySelector('.selfcheck:nth-of-type(1)').checked,
-          benefitsExplained: $('#finalText').parentElement.querySelector('.selfcheck:nth-of-type(2)').checked,
-          carefulLanguage: $('#finalText').parentElement.querySelector('.selfcheck:nth-of-type(3)').checked,
-          extraFacts: $('#finalText').parentElement.querySelector('.selfcheck:nth-of-type(4)').checked
+          vocabularyUsed: selfChecks[0]?.checked || false,
+          benefitsExplained: selfChecks[1]?.checked || false,
+          carefulLanguage: selfChecks[2]?.checked || false,
+          extraFacts: selfChecks[3]?.checked || false
         }
       };
     }
@@ -3139,103 +3139,276 @@
         showToast('Download failed ❌');
       }
     }
-    
-    function requestPDF(){
+
+    function escapeHTML(value){
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function collectAllFormState(){
+      const fields = [];
+
+      document.querySelectorAll('textarea, input, select').forEach((el) => {
+        if(el.closest('#visualOptions')) return;
+        if(el.type === 'range') return;
+        if(el.type === 'button') return;
+        if(el.type === 'hidden') return;
+        if(!el.id && !el.name && !el.className) return;
+
+        const sectionTitle =
+          el.closest('section')?.querySelector('h2')?.textContent?.trim()
+          || 'Activity';
+
+        const questionTitle =
+          el.closest('.question')?.querySelector('strong')?.textContent?.trim()
+          || el.closest('.sort-row')?.querySelector('strong')?.textContent?.trim()
+          || el.closest('.timeline-item')?.textContent?.replace(/\s+/g,' ')?.trim()
+          || '';
+
+        const label =
+          questionTitle
+          || el.getAttribute('aria-label')
+          || el.id
+          || el.name
+          || sectionTitle;
+
+        let value = '';
+
+        if(el.type === 'checkbox'){
+          value = el.checked ? 'checked' : 'not checked';
+        }else if(el.type === 'radio'){
+          if(!el.checked) return;
+          value = el.value || 'selected';
+        }else{
+          value = el.value || '';
+        }
+
+        fields.push({
+          section: sectionTitle,
+          label,
+          id: el.id || '',
+          name: el.name || '',
+          type: el.type || el.tagName.toLowerCase(),
+          value
+        });
+      });
+
+      return fields;
+    }
+
+    function downloadHTMLExport(){
       try{
         const finalText = $('#finalText');
-        const wordCount$ = wordCount(finalText.value);
+        const wordCountFinal = wordCount(finalText.value);
         const allChecks = $$('.selfcheck').every(c => c.checked);
-        const hasMinWords = wordCount$ >= 120;
-        
+        const hasMinWords = wordCountFinal >= 120;
+
         if(xp < 100 || !hasMinWords || !allChecks){
-          showToast('PDF unlock requirements not met ❌');
+          showToast('HTML Export unlock requirements not met ❌');
           return;
         }
-        
-        // Create PDF content
-        const checks = $$('.selfcheck').map((c,i) => `${c.checked ? '✅' : '⬜'} ${['Used 5+ vocab words', 'Explained 2+ benefits', 'Used careful language', 'Wrote 2+ research facts'][i]}`).join('\n');
+
+        const checks = $$('.selfcheck').map((c,i) => {
+          const labels = [
+            'Used 5+ vocabulary words',
+            'Explained 2+ benefits',
+            'Used careful scientific language',
+            'Wrote 2+ research facts'
+          ];
+          return `${c.checked ? '✅' : '⬜'} ${labels[i] || `Self-check ${i+1}`}`;
+        });
+
+        const allFields = collectAllFormState();
+
+        const allFieldsHTML = allFields.map(field => `
+          <tr>
+            <td>${escapeHTML(field.section)}</td>
+            <th>${escapeHTML(field.label)}</th>
+            <td>${escapeHTML(field.value || '(empty)')}</td>
+          </tr>
+        `).join('');
+
         const htmlContent = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Sloth, Moth & Algae – Final Worksheet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sloth, Moth & Algae – HTML Export</title>
   <style>
-    body { font-family: system-ui, sans-serif; padding: 40px; line-height: 1.6; color: #17352a; }
-    h1 { color: #10291f; margin-bottom: 10px; }
-    .timestamp { color: #5f766d; font-size: 0.9em; margin-bottom: 20px; }
-    .section { margin: 20px 0; padding: 15px; border-left: 4px solid #6fcf7d; background: #f6fff5; }
-    .section h2 { color: #1e6046; margin-top: 0; }
-    .checks { background: #fffdf7; padding: 10px; border-radius: 8px; font-family: monospace; white-space: pre-wrap; }
-    .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #d8e9dd; font-size: 0.9em; color: #5f766d; }
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      margin:0;
+      padding:40px;
+      line-height:1.6;
+      color:#17352a;
+      background:linear-gradient(145deg,#f6fff5,#fff8e9);
+    }
+    main{
+      max-width:960px;
+      margin:0 auto;
+      background:white;
+      border:1px solid #d8e9dd;
+      border-radius:24px;
+      padding:34px;
+      box-shadow:0 18px 42px rgba(16,41,31,.10);
+    }
+    h1{
+      margin:0 0 8px;
+      color:#10291f;
+      line-height:1.1;
+      letter-spacing:-.03em;
+    }
+    h2{
+      margin-top:28px;
+      color:#1e6046;
+      border-bottom:2px solid #d8e9dd;
+      padding-bottom:6px;
+    }
+    .timestamp,.meta{
+      color:#5f766d;
+      font-weight:650;
+    }
+    .section{
+      margin:18px 0;
+      padding:16px;
+      border-left:5px solid #6fcf7d;
+      background:#f6fff5;
+      border-radius:14px;
+    }
+    .answer{
+      white-space:pre-wrap;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:14px;
+      font-size:.95rem;
+    }
+    th,td{
+      text-align:left;
+      vertical-align:top;
+      border-bottom:1px solid #d8e9dd;
+      padding:10px;
+      word-break:break-word;
+    }
+    th{
+      width:34%;
+      color:#315548;
+      background:#f8fff8;
+    }
+    td:first-child{
+      width:18%;
+      color:#5f766d;
+      font-weight:700;
+    }
+    .print-btn{
+      margin:18px 0 26px;
+      padding:10px 16px;
+      border-radius:999px;
+      border:1px solid #cfe5d2;
+      background:#eff9f0;
+      color:#245a3e;
+      font-weight:800;
+      cursor:pointer;
+    }
+    @media print{
+      body{background:white;padding:0;}
+      main{box-shadow:none;border:none;border-radius:0;}
+      .print-btn{display:none;}
+    }
   </style>
 </head>
 <body>
-  <h1>🦥 Sloth, Moth & Algae – Final Worksheet</h1>
-  <p class="timestamp">Generated: ${new Date().toLocaleString()}</p>
-  
-  <div class="section">
+<main>
+  <h1>🦥 Sloth, Moth & Algae – HTML Export</h1>
+  <p class="timestamp">Generated: ${escapeHTML(new Date().toLocaleString())}</p>
+  <p class="meta">XP earned: ${escapeHTML(xp)} · Final word count: ${escapeHTML(wordCountFinal)}</p>
+
+  <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+
+  <section class="section">
     <h2>Prediction</h2>
-    <p>${$('#predictionBox').value.trim() || '(not filled)'}</p>
-  </div>
-  
-  <div class="section">
+    <p class="answer">${escapeHTML($('#predictionBox')?.value?.trim() || '(not filled)')}</p>
+  </section>
+
+  <section class="section">
     <h2>Three Surprising Things</h2>
-    <p>${$('#surpriseBox').value.trim() || '(not filled)'}</p>
-  </div>
-  
-  <div class="section">
+    <p class="answer">${escapeHTML($('#surpriseBox')?.value?.trim() || '(not filled)')}</p>
+  </section>
+
+  <section class="section">
     <h2>Evidence Reflection</h2>
-    <p>${$('#evidenceBox').value.trim() || '(not filled)'}</p>
-  </div>
-  
-  <div class="section">
+    <p class="answer">${escapeHTML($('#evidenceBox')?.value?.trim() || '(not filled)')}</p>
+  </section>
+
+  <section class="section">
     <h2>Research Findings</h2>
-    <p><strong>Fact 1:</strong> ${$('#fact1').value.trim() || '(not filled)'}</p>
-    <p><strong>Source:</strong> ${$('#source1').value.trim() || '(not filled)'}</p>
-    <p style="margin-top: 15px;"><strong>Fact 2:</strong> ${$('#fact2').value.trim() || '(not filled)'}</p>
-    <p><strong>Source:</strong> ${$('#source2').value.trim() || '(not filled)'}</p>
-  </div>
-  
-  <div class="section">
-    <h2>Final Explanation (${wordCount$} words)</h2>
-    <p>${$('#finalText').value.trim()}</p>
-  </div>
-  
-  <div class="section">
+    <p><strong>Fact 1:</strong> ${escapeHTML($('#fact1')?.value?.trim() || '(not filled)')}</p>
+    <p><strong>Source 1:</strong> ${escapeHTML($('#source1')?.value?.trim() || '(not filled)')}</p>
+    <p><strong>Fact 2:</strong> ${escapeHTML($('#fact2')?.value?.trim() || '(not filled)')}</p>
+    <p><strong>Source 2:</strong> ${escapeHTML($('#source2')?.value?.trim() || '(not filled)')}</p>
+  </section>
+
+  <section class="section">
+    <h2>Final Explanation</h2>
+    <p class="answer">${escapeHTML($('#finalText')?.value?.trim() || '(not filled)')}</p>
+  </section>
+
+  <section class="section">
     <h2>Self-Check Results</h2>
-    <div class="checks">${checks}</div>
-  </div>
-  
-  <div class="footer">
-    <p>🎮 Total XP earned: ${xp}</p>
-    <p>✅ All requirements met. Export ready! 🏆</p>
-  </div>
+    <p class="answer">${escapeHTML(checks.join('\n'))}</p>
+  </section>
+
+  <section class="section">
+    <h2>All Activity Answers</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Slide</th>
+          <th>Question / Field</th>
+          <th>Answer</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${allFieldsHTML || '<tr><td colspan="3">(no form state found)</td></tr>'}
+      </tbody>
+    </table>
+  </section>
+</main>
 </body>
 </html>
         `;
-        
-        // Create and trigger PDF download
+
         const blob = new Blob([htmlContent], {type: 'text/html'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `sloth-moth-final-${Date.now()}.html`;
+        a.download = `sloth-moth-html-export-${Date.now()}.html`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
+
         playSoftTone('success');
-        showToast('PDF downloaded ✅');
+        showToast('HTML Export downloaded ✅');
         burstConfetti(window.innerWidth/2, window.innerHeight/2, 50);
-        showReaction('Export ready! 🏆', window.innerWidth/2, window.innerHeight/2);
+        showReaction('HTML Export ready! 🏆', window.innerWidth/2, window.innerHeight/2);
       }catch(e){
-        console.error('PDF generation failed:', e);
-        showToast('PDF generation failed ❌');
+        console.error('HTML Export failed:', e);
+        showToast('HTML Export failed ❌');
       }
     }
-    
+
+    /* Legacy compatibility: old code may still call requestPDF(). */
+    function requestPDF(){
+      downloadHTMLExport();
+    }
+
     function makeCopyText(){
       const checks = $$('.selfcheck').map((c,i) => `${c.checked ? '✅' : '⬜'} Self-check ${i+1}`).join('\n');
       const text = `Sloth, Moth & Algae – Worksheet answers\n\nPrediction:\n${$('#predictionBox').value.trim()}\n\nSurprising things:\n${$('#surpriseBox').value.trim()}\n\nEvidence reflection:\n${$('#evidenceBox').value.trim()}\n\nResearch fact 1:\n${$('#fact1').value.trim()}\nSource: ${$('#source1').value.trim()}\n\nResearch fact 2:\n${$('#fact2').value.trim()}\nSource: ${$('#source2').value.trim()}\n\nFinal explanation:\n${$('#finalText').value.trim()}\n\n${checks}`;
@@ -3852,5 +4025,240 @@
   applyVisualSettings();
 })();
 </script>
+
+<script>
+/* Persistent worksheet state -------------------------------------------------
+   Saves all learner inputs locally so the HTML report/export can be created
+   later, even after closing or reloading the page. */
+(function(){
+  const STORAGE_KEY = 'slothMothWorksheetState_v1';
+  const SAVE_DELAY = 80;
+  let saveTimer = null;
+  let isRestoring = false;
+
+  function safeParse(raw, fallback){
+    try{ return raw ? JSON.parse(raw) : fallback; }catch(e){ return fallback; }
+  }
+
+  function isWorksheetControl(el){
+    if(!el || !el.matches || !el.matches('textarea,input,select')) return false;
+    if(el.closest('#visualOptions')) return false;
+    if(['button','hidden','range','submit','reset','file'].includes(el.type)) return false;
+    return true;
+  }
+
+  function makeControlKey(el, index){
+    if(el.id) return `${el.tagName.toLowerCase()}#${el.id}`;
+    if(el.type === 'radio' && el.name) return `radio:${el.name}:${el.value}`;
+    if(el.name) return `${el.tagName.toLowerCase()}[name="${el.name}"]:${el.value || index}`;
+    if(el.classList.contains('selfcheck')) return `checkbox:selfcheck:${Array.from(document.querySelectorAll('.selfcheck')).indexOf(el)}`;
+    if(el.classList.contains('order-live')) return `select:order-live:${el.dataset.step || index}`;
+    if(el.classList.contains('benefit')) return `select:benefit:${Array.from(document.querySelectorAll('.benefit')).indexOf(el)}`;
+    return `${el.tagName.toLowerCase()}:auto:${index}`;
+  }
+
+  function controls(){
+    return Array.from(document.querySelectorAll('textarea,input,select')).filter(isWorksheetControl);
+  }
+
+  function selectedButtonState(){
+    const groups = [];
+    document.querySelectorAll('#vocabChoices,.gap-question,[id^="mini"],.question').forEach((box, groupIndex) => {
+      const buttons = Array.from(box.querySelectorAll('.choice-btn,.gap-option'));
+      if(!buttons.length) return;
+      const selectedIndex = buttons.findIndex(btn => btn.classList.contains('selected'));
+      const selectedValue = selectedIndex >= 0
+        ? (buttons[selectedIndex].dataset.value || buttons[selectedIndex].textContent.trim())
+        : '';
+      groups.push({
+        key: box.id || `${box.className || 'button-group'}:${groupIndex}`,
+        choice: box.dataset.choice || selectedValue,
+        selectedIndex,
+        selectedValue
+      });
+    });
+    return groups;
+  }
+
+  function collectState(){
+    const form = {};
+    controls().forEach((el, index) => {
+      const key = makeControlKey(el, index);
+      form[key] = {
+        tag: el.tagName.toLowerCase(),
+        type: el.type || '',
+        id: el.id || '',
+        name: el.name || '',
+        value: el.type === 'checkbox' || el.type === 'radio' ? el.checked : el.value,
+        checked: !!el.checked
+      };
+    });
+
+    const quizFeedback = {};
+    document.querySelectorAll('.feedback, #lifeCycleFb').forEach((el, index) => {
+      const key = el.id ? `id:${el.id}` : `index:${index}`;
+      quizFeedback[key] = el.innerHTML;
+    });
+
+    const classStates = [];
+    document.querySelectorAll('.choice-btn, .gap-option, .gap-question, .order-live, .order-item, .benefit, .sort-row').forEach((el, index) => {
+      const classes = [];
+      ['selected', 'correct', 'wrong', 'done'].forEach(cls => {
+        if (el.classList.contains(cls)) classes.push(cls);
+      });
+      if (classes.length > 0) {
+        classStates.push({ index, classes });
+      }
+    });
+
+    return {
+      version: 1,
+      savedAt: new Date().toISOString(),
+      currentSlide: typeof current === 'number' ? current : 0,
+      xp: typeof xp === 'number' ? xp : 0,
+      xpKeys: (typeof XP_EARNED_KEYS !== 'undefined') ? Array.from(XP_EARNED_KEYS) : [],
+      openVocabCards: Array.from(document.querySelectorAll('#vocabGrid .vocab-card')).map(card => card.classList.contains('open')),
+      selectedButtons: selectedButtonState(),
+      form,
+      quizFeedback,
+      classStates
+    };
+  }
+
+  function saveState(){
+    if(isRestoring) return;
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectState()));
+    }catch(e){
+      console.warn('Worksheet state could not be saved:', e);
+    }
+  }
+
+  function scheduleSave(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveState, SAVE_DELAY);
+  }
+
+  function restoreState(){
+    const state = safeParse(localStorage.getItem(STORAGE_KEY), null);
+    if(!state || !state.form) return;
+    isRestoring = true;
+
+    controls().forEach((el, index) => {
+      const key = makeControlKey(el, index);
+      const saved = state.form[key];
+      if(!saved) return;
+      if(el.type === 'checkbox' || el.type === 'radio'){
+        el.checked = !!saved.checked || saved.value === true;
+      }else{
+        el.value = saved.value ?? '';
+      }
+    });
+
+    if(Array.isArray(state.openVocabCards)){
+      document.querySelectorAll('#vocabGrid .vocab-card').forEach((card, index) => {
+        card.classList.toggle('open', !!state.openVocabCards[index]);
+        if(state.openVocabCards[index]) card.dataset.xp = 'true';
+      });
+    }
+
+    if(Array.isArray(state.selectedButtons)){
+      state.selectedButtons.forEach(group => {
+        const box = group.key && document.getElementById(group.key)
+          ? document.getElementById(group.key)
+          : null;
+        if(!box) return;
+        if(group.choice) box.dataset.choice = group.choice;
+        const buttons = Array.from(box.querySelectorAll('.choice-btn,.gap-option'));
+        buttons.forEach(btn => btn.classList.remove('selected'));
+        let target = buttons[group.selectedIndex];
+        if(!target && group.selectedValue){
+          target = buttons.find(btn => (btn.dataset.value || btn.textContent.trim()) === group.selectedValue);
+        }
+        target?.classList.add('selected');
+      });
+    }
+
+    // Restore classes
+    if(Array.isArray(state.classStates)){
+      const elements = document.querySelectorAll('.choice-btn, .gap-option, .gap-question, .order-live, .order-item, .benefit, .sort-row');
+      elements.forEach(el => el.classList.remove('selected', 'correct', 'wrong', 'done'));
+      state.classStates.forEach(item => {
+        const el = elements[item.index];
+        if(el) {
+          item.classes.forEach(cls => el.classList.add(cls));
+        }
+      });
+    }
+
+    // Restore feedback innerHTML
+    if(state.quizFeedback){
+      document.querySelectorAll('.feedback, #lifeCycleFb').forEach((el, index) => {
+        const key = el.id ? `id:${el.id}` : `index:${index}`;
+        if(state.quizFeedback[key] !== undefined){
+          el.innerHTML = state.quizFeedback[key];
+        }
+      });
+    }
+
+    if(typeof xp === 'number' && typeof state.xp === 'number') xp = Math.max(xp || 0, state.xp);
+    if(Array.isArray(state.xpKeys) && typeof XP_EARNED_KEYS !== 'undefined'){
+      state.xpKeys.forEach(key => XP_EARNED_KEYS.add(key));
+    }
+
+    const finalText = document.getElementById('finalText');
+    const wordCountEl = document.getElementById('wordCount');
+    if(finalText && wordCountEl && typeof wordCount === 'function'){
+      wordCountEl.textContent = wordCount(finalText.value);
+      if(typeof setFinalGlow === 'function') setFinalGlow(wordCount(finalText.value));
+    }
+
+    try{ updateJuiceHud?.(); updateSlideUI?.(); }catch(e){}
+    isRestoring = false;
+  }
+
+  restoreState();
+
+  document.addEventListener('input', event => {
+    if(isWorksheetControl(event.target)) scheduleSave();
+  }, true);
+  document.addEventListener('change', event => {
+    if(isWorksheetControl(event.target)) scheduleSave();
+  }, true);
+  document.addEventListener('click', event => {
+    if(event.target.closest('.choice-btn,.gap-option,.vocab-card,button')) setTimeout(scheduleSave, 0);
+  }, true);
+  document.addEventListener('keyup', event => {
+    if(isWorksheetControl(event.target)) scheduleSave();
+  }, true);
+  window.addEventListener('beforeunload', saveState);
+
+  window.saveSlothMothWorksheetState = saveState;
+  window.restoreSlothMothWorksheetState = restoreState;
+  window.getSlothMothWorksheetState = collectState;
+
+  if(typeof downloadHTMLExport === 'function' && !downloadHTMLExport.__storageWrapped){
+    const oldDownloadHTMLExport = downloadHTMLExport;
+    window.downloadHTMLExport = downloadHTMLExport = function(){
+      saveState();
+      return oldDownloadHTMLExport.apply(this, arguments);
+    };
+    downloadHTMLExport.__storageWrapped = true;
+  }
+
+  if(typeof downloadWorksheetJSON === 'function' && !downloadWorksheetJSON.__storageWrapped){
+    const oldDownloadWorksheetJSON = downloadWorksheetJSON;
+    window.downloadWorksheetJSON = downloadWorksheetJSON = function(){
+      saveState();
+      return oldDownloadWorksheetJSON.apply(this, arguments);
+    };
+    downloadWorksheetJSON.__storageWrapped = true;
+  }
+
+  // Save once after all late scripts and restored XP have settled.
+  setTimeout(saveState, 250);
+})();
+</script>
+
 </body>
 </html>
