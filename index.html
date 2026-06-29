@@ -4209,6 +4209,7 @@
           setTimeout(() => badge.remove(), 400);
           
           awardXP(2, 'Explored! 🔬', e.clientX || window.innerWidth/2, e.clientY || window.innerHeight/2);
+          floatHearts(e.clientX || window.innerWidth/2, e.clientY || window.innerHeight/2, 4);
           playSoftTone('success');
           
           const saveFunc = typeof scheduleSave === 'function' ? scheduleSave : window.scheduleSave;
@@ -4236,7 +4237,15 @@
           }
         });
       });
-      showToast('Slide controls ready ✨');
+      document.querySelectorAll('textarea,input[type="text"]').forEach((field, index) => {
+        field.addEventListener('blur', () => {
+          if(field.value.trim().length > 0){
+            const r = field.getBoundingClientRect();
+            awardOnce(`text-${index}`, 10, 'Writing saved', r.left + r.width/2, r.top + 16);
+          }
+        });
+      });
+      showToast('XP unlocks ready ✨');
     }
 
 
@@ -4387,29 +4396,7 @@
       window.__mothResizeTimer = setTimeout(() => createButterflies(), 180);
     });
 
-    function setupTikTokJuice(){
-      updateJuiceHud();
-      document.querySelectorAll('.scene-panel,.hero-img').forEach((panel, index) => {
-        panel.classList.add('xp-image');
-        panel.addEventListener('click', (e)=>{
-          const r = panel.getBoundingClientRect();
-          if(awardOnce(`picture-${index}`, 2, 'Image explored', e.clientX || (r.left+r.width/2), e.clientY || (r.top+r.height/2))){
-            panel.classList.add('xp-earned');
-            floatHearts(e.clientX || (r.left+r.width/2), e.clientY || (r.top+r.height/2), 4);
-            playSoftTone('success');
-          }
-        });
-      });
-      document.querySelectorAll('textarea,input[type="text"]').forEach((field, index) => {
-        field.addEventListener('blur', () => {
-          if(field.value.trim().length > 0){
-            const r = field.getBoundingClientRect();
-            awardOnce(`text-${index}`, 10, 'Writing saved', r.left + r.width/2, r.top + 16);
-          }
-        });
-      });
-      showToast('XP unlocks ready ✨');
-    }
+
 
     createButterflies();
     wirePremiumPointer();
