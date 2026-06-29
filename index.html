@@ -1545,14 +1545,12 @@
     .slide[data-title="Final task"] .scene-gallery .scene-panel{overflow:hidden;}
 
     .writing-layout {
-      width:100%;
-      margin:12px 0;
+      width: 100%;
+      margin: 12px 0;
       transition: all 0.3s ease;
-    }
-    .writing-layout.split-mode {
-      display: grid !important;
-      grid-template-columns: 1fr 1fr !important;
-      gap: 20px !important;
+      display: grid;
+      grid-template-columns: 6fr 4fr;
+      gap: 20px;
       align-items: stretch;
     }
     .writing-textarea-side {
@@ -1636,7 +1634,7 @@
       font-size: 0.72rem !important;
     }
     @media (max-width: 760px) {
-      .writing-layout.split-mode {
+      .writing-layout {
         grid-template-columns: 1fr !important;
       }
       .writing-vocab-side {
@@ -3252,7 +3250,7 @@
     <div class="pillbox" style="margin-top:8px;"><span class="pill">Words: <span id="wordCount">0</span></span><span class="pill">Target: 120+</span></div>
   </div>
 
-  <div class="writing-vocab-side" id="vocabBookPanel" hidden style="display:none;">
+  <div class="writing-vocab-side" id="vocabBookPanel">
     <h3 style="display:flex;align-items:center;justify-content:space-between;width:100%;margin:0 0 12px 0;">
       <span>📖 Wortschatz-Hilfe</span>
       <span class="badge" id="vocabBookCountBadge">0 / 5 verwendet</span>
@@ -3271,9 +3269,7 @@
   </div>
 </div>
 
-<div class="pillbox" style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
-  <button class="ghost" id="toggleVocabBookBtn" onclick="toggleVocabBook()">📖 Wortschatz-Buch öffnen</button>
-</div>
+
 </div>
 <div class="selfcheck-section">
 <h3>Self-check</h3>
@@ -3390,22 +3386,7 @@
     function nextSlide(){goToSlide(current + 1)}
     function prevSlide(){goToSlide(current - 1)}
     function toggleVocabBook(){
-      const panel = document.getElementById('vocabBookPanel');
-      const layout = document.querySelector('.writing-layout');
-      const btn = document.getElementById('toggleVocabBookBtn');
-      if (panel.style.display === 'none' || panel.hidden) {
-        panel.style.display = 'block';
-        panel.hidden = false;
-        layout.classList.add('split-mode');
-        btn.textContent = '📖 Wortschatz-Buch schließen';
-      } else {
-        panel.style.display = 'none';
-        panel.hidden = true;
-        layout.classList.remove('split-mode');
-        btn.textContent = '📖 Wortschatz-Buch öffnen';
-      }
-      const saveFunc = typeof scheduleSave === 'function' ? scheduleSave : window.scheduleSave;
-      if (typeof saveFunc === 'function') setTimeout(saveFunc, 0);
+      // Vocab book is now always open.
     }
     function checkFinalEssayVocabulary() {
       const text = (document.getElementById('finalText')?.value || '').toLowerCase();
@@ -3776,7 +3757,7 @@
     function setFinalGlow(count){
       const box = document.querySelector('.final-box');
       if(box) box.style.setProperty('--wc', Math.min(90, Math.max(15, count)) + '%');
-      if(count === 70) showReaction('70 words! ✍️', window.innerWidth/2, window.innerHeight*.45);
+      if(count === 120) showReaction('120 words! ✍️', window.innerWidth/2, window.innerHeight*.45);
     }
     $('#finalText').addEventListener('input', () => {
       const count = wordCount($('#finalText').value);
