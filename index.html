@@ -3295,6 +3295,10 @@
       <img alt="Sloth celebration in the jungle" src="assets/sloth_subtle_party.webp" />
     </figure>
   </div>
+  <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 320px; margin-bottom: 8px;">
+    <label for="studentNameInput" style="font-weight: 800; font-size: 0.85rem; color: #1e6046; text-transform: uppercase; letter-spacing: 0.5px;">Dein Name (für den Export):</label>
+    <input type="text" id="studentNameInput" placeholder="Vorname" style="padding: 10px 14px; border: 1.5px solid rgba(30, 96, 70, 0.25); border-radius: 12px; background: rgba(255, 255, 255, 0.82); font-size: 0.95rem; font-family: inherit; color: #17352a; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#1e6046'" onblur="this.style.borderColor='rgba(30, 96, 70, 0.25)'" />
+  </div>
   <div class="pillbox" style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
     <button class="secondary" id="finalHtmlExportBtn" onclick="downloadHTMLExport()">HTML Export herunterladen</button>
     <button class="plain" id="jsonDownloadBtn2" onclick="downloadWorksheetJSON()">JSON herunterladen</button>
@@ -3770,6 +3774,7 @@
       const selfChecks = document.querySelectorAll('.selfcheck');
       return {
         title: 'Sloth, Moth & Algae – Worksheet',
+        studentName: document.getElementById('studentNameInput')?.value?.trim() || 'Anonymous Student',
         timestamp: new Date().toISOString(),
         xp: xp,
         prediction: $('#predictionBox')?.value?.trim() || '',
@@ -3889,6 +3894,8 @@
           return;
         }
 
+        const studentName = document.getElementById('studentNameInput')?.value?.trim() || 'Anonymous Student';
+
         const checks = $$('.selfcheck').map((c,i) => {
           const labels = [
             'Used 5+ vocabulary words',
@@ -4003,8 +4010,12 @@
 <body>
 <main>
   <h1>🦥 Sloth, Moth & Algae – HTML Export</h1>
-  <p class="timestamp">Generated: ${escapeHTML(new Date().toLocaleString())}</p>
-  <p class="meta">XP earned: ${escapeHTML(xp)} · Final word count: ${escapeHTML(wordCountFinal)}</p>
+  <div style="margin-bottom:20px; padding:14px; background:#eff9f0; border:1px solid #cfe5d2; border-radius:14px; font-size:0.95rem; color:#245a3e; line-height:1.5;">
+    <strong>Name:</strong> ${escapeHTML(studentName)} <br>
+    <strong>Datum:</strong> ${escapeHTML(new Date().toLocaleString())} <br>
+    <strong>XP gesammelt:</strong> ${escapeHTML(xp)} XP <br>
+    <strong>Wortanzahl (Essay):</strong> ${escapeHTML(wordCountFinal)} Wörter (Ziel: 120+)
+  </div>
 
   <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
 
